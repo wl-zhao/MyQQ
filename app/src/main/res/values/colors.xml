@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#4497fb</color>
+    <color name="colorPrimaryDark">#328ef3</color>
+    <color name="colorAccent">#D81B60</color>
+    <color name="divide_line">#CBCED2</color>
+    <color name="white">#fff</color>
+    <!--tabs color-->
+    <color name="color_bottom_text_normal">#9da0a4</color>
+    <color name="color_bottom_text_press">#4f9ef6</color>
+    <color name="gray">#777777</color>
+    <color name="item_selected">#eef8ff</color>
+    <color name="msg_chat_bg">#eceff4</color>
+    <color name="base_color_text_black">#3e3e39</color>
+    <color name="base_color_text_gray">#9fa0a0</color>
+    <color name="base_color_text_white">#ffffff</color>
+    <color name="msg_emote_divider">#ffa1a1a1</color>
+
+</resources>

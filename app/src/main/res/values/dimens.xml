@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="base_line_width_1">1dip</dimen>
+    <dimen name="message_top_height">70.0dip</dimen>
+    <dimen name="base_scrollview_top_height">50.0dip</dimen>
+    <dimen name="tab_padding_top_bottom">15dp</dimen>
+    <dimen name="tab_padding_left_right">40dp</dimen>
+    <dimen name="margin_chat_top">5.0dip</dimen>
+</resources>

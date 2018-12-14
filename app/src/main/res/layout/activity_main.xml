@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".Activities.MainActivity">
+
+    <!--top bar-->
+    <LinearLayout
+        android:id="@+id/top_bar"
+        android:layout_width="match_parent"
+        android:layout_height="55dp"
+        android:background="@color/colorPrimary"
+        android:orientation="horizontal"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <android.support.constraint.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <ImageView
+                android:id="@+id/imageView"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_gravity="center_vertical"
+                android:layout_weight="1"
+                android:padding="5dp"
+                android:src="@drawable/github"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <LinearLayout
+                android:id="@+id/searchLayout"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_margin="12dp"
+                android:layout_weight="1"
+                android:background="@color/colorPrimaryDark"
+                android:orientation="horizontal"
+                android:padding="0dp"
+                android:paddingTop="0dp"
+                android:paddingBottom="0dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/addFriendButton"
+                app:layout_constraintStart_toEndOf="@+id/imageView"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <SearchView
+                    android:id="@+id/search_friend"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@android:color/transparent"
+                    android:iconifiedByDefault="false"
+                    android:isScrollContainer="false"
+                    android:padding="0dp"
+                    android:queryHint="@string/search">
+
+                </SearchView>
+            </LinearLayout>
+
+            <ImageButton
+                android:id="@+id/addFriendButton"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:background="@null"
+                android:padding="15dp"
+                android:paddingTop="0dp"
+                android:paddingBottom="0dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/white_plus"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+        </android.support.constraint.ConstraintLayout>
+    </LinearLayout>
+
+    <!--bottom bar-->
+    <LinearLayout
+        android:id="@+id/bottom_bar"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <android.support.constraint.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <Button
+                android:id="@+id/tab_chat_btn"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:background="@android:color/white"
+                android:drawableTop="@drawable/tab_message_btn"
+                android:paddingTop="7dip"
+                android:paddingBottom="2dip"
+                android:text="@string/tab_chat"
+                android:onClick="onTabSelect"
+                android:textColor="@drawable/tab_textcolor"
+                android:textSize="12sp"
+                style="?android:attr/borderlessButtonStyle"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/tab_contact_btn"
+                app:layout_constraintHorizontal_weight="1"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <Button
+                android:id="@+id/tab_contact_btn"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:background="@android:color/white"
+                android:drawableTop="@drawable/tab_contact_btn"
+                android:paddingTop="7dip"
+                android:paddingBottom="2dip"
+                android:text="@string/tab_contact"
+                android:onClick="onTabSelect"
+                android:textColor="@drawable/tab_textcolor"
+                android:textSize="12sp"
+                style="?android:attr/borderlessButtonStyle"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/tab_set_btn"
+                app:layout_constraintHorizontal_weight="1"
+                app:layout_constraintStart_toEndOf="@+id/tab_chat_btn"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <Button
+                android:id="@+id/tab_set_btn"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:background="@android:color/white"
+                android:drawableTop="@drawable/tab_set_btn"
+                android:paddingTop="7dip"
+                android:paddingBottom="2dip"
+                android:text="@string/tab_set"
+                android:onClick="onTabSelect"
+                android:textColor="@drawable/tab_textcolor"
+                android:textSize="12sp"
+                style="?android:attr/borderlessButtonStyle"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_weight="1"
+                app:layout_constraintStart_toEndOf="@+id/tab_contact_btn"
+                app:layout_constraintTop_toTopOf="parent" />
+        </android.support.constraint.ConstraintLayout>
+    </LinearLayout>
+
+    <View
+        android:id="@+id/line"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/divide_line"
+        app:layout_constraintBottom_toTopOf="@id/bottom_bar" />
+
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/fragment_container"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@+id/line"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/top_bar">
+
+    </android.support.constraint.ConstraintLayout>
+
+</android.support.constraint.ConstraintLayout>
