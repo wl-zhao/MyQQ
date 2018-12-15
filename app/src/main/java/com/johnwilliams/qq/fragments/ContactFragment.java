@@ -4,11 +4,13 @@ import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.johnwilliams.qq.R;
 import com.johnwilliams.qq.tools.Contact.Contact;
@@ -18,7 +20,8 @@ import com.johnwilliams.qq.tools.Contact.ContactViewModel;
 import java.util.List;
 
 public class ContactFragment extends MyFragment{
-    RecyclerView contactList;
+    private SwipeRefreshLayout swipeContainer;
+    private RecyclerView contactList;
     public ContactViewModel mContactViewModel;
     public ContactListAdapter mAdapter;
 
@@ -46,6 +49,17 @@ public class ContactFragment extends MyFragment{
                 mAdapter.setContacts(contacts);
             }
         });
-        mAdapter.refresh();
+        swipeContainer = (SwipeRefreshLayout) findViewById(R.id.swipeContainer);
+        swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                mAdapter.refresh();
+                swipeContainer.setRefreshing(false);
+            }
+        });
+        swipeContainer.setColorSchemeResources(android.R.color.holo_blue_bright,
+                android.R.color.holo_green_light,
+                android.R.color.holo_orange_light,
+                android.R.color.holo_red_light);
     }
 }
