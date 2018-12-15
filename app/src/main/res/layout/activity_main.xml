@@ -56,7 +56,8 @@
                     android:iconifiedByDefault="false"
                     android:isScrollContainer="false"
                     android:padding="0dp"
-                    android:queryHint="@string/search">
+                    android:queryHint="@string/search"
+                    android:theme="@style/SearchViewTheme">
 
                 </SearchView>
             </LinearLayout>

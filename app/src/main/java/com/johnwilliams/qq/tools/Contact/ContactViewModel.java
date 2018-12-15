@@ -23,4 +23,8 @@ public class ContactViewModel extends AndroidViewModel {
     public void insert(Contact chat){
         mRepository.insert(chat);
     }
+
+    public void clear(){
+        mRepository.clear();
+    }
 }

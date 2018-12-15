@@ -52,7 +52,7 @@ public abstract class ChatDatabase extends RoomDatabase {
 
         @Override
         protected Void doInBackground(final Void... params){
-            mDao.deleteAll();
+//            mDao.deleteAll();
             Chat chat = new Chat("2016011451", "佳", new Date().getTime(), 1, "亮亮我爱你");
             mDao.insert(chat);
             chat = new Chat("2016011452", "赵文亮",

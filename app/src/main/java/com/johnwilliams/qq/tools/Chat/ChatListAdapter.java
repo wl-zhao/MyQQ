@@ -1,7 +1,10 @@
 package com.johnwilliams.qq.tools.Chat;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -16,6 +19,7 @@ import com.johnwilliams.qq.Activities.MainActivity;
 import com.johnwilliams.qq.R;
 import com.johnwilliams.qq.tools.Constant;
 import com.johnwilliams.qq.tools.RecyclerItemClickListener;
+import com.johnwilliams.qq.tools.RecyclerItemLongClickListener;
 import com.johnwilliams.qq.tools.TimeUtil;
 
 import java.text.SimpleDateFormat;
@@ -26,29 +30,38 @@ import java.util.TimeZone;
 
 public class ChatListAdapter extends RecyclerView.Adapter<ChatListAdapter.ChatViewHolder>{
 
-    class ChatViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
+    class ChatViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
         private final ImageView chat_profile;
         private final TextView chat_name;
         private final TextView chat_last_msg;
         private final TextView chat_time;
         private final TextView chat_unread;
 
-        private RecyclerItemClickListener mListener;
+        private RecyclerItemClickListener mClickListener;
+        private RecyclerItemLongClickListener mLongClickListener;
 
-        private ChatViewHolder(View itemView, RecyclerItemClickListener listener){
+        private ChatViewHolder(View itemView, RecyclerItemClickListener listener, RecyclerItemLongClickListener longClickListener){
             super(itemView);
             chat_profile = itemView.findViewById(R.id.chat_profile);
             chat_name = itemView.findViewById(R.id.chat_name);
             chat_last_msg = itemView.findViewById(R.id.last_msg);
             chat_time = itemView.findViewById(R.id.chat_time);
             chat_unread = itemView.findViewById(R.id.chat_unread);
-            mListener = listener;
+            mClickListener = listener;
+            mLongClickListener = longClickListener;
             itemView.setOnClickListener(this);
+            itemView.setOnLongClickListener(this);
         }
 
         @Override
         public void onClick(View view){
-            mListener.onClick(view, getAdapterPosition());
+            mClickListener.onClick(view, getAdapterPosition());
+        }
+
+        @Override
+        public boolean onLongClick(View view){
+            mLongClickListener.onLongClick(view, getAdapterPosition());
+            return true;
         }
 
         private void ClearView(){
@@ -67,16 +80,23 @@ public class ChatListAdapter extends RecyclerView.Adapter<ChatListAdapter.ChatVi
     private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
     private SimpleDateFormat sdf_today = new SimpleDateFormat("HH:mm", Locale.CHINA);
 
-    private RecyclerItemClickListener mListener;
+    private RecyclerItemClickListener mClickListener;
+    private RecyclerItemLongClickListener mLongClickListener;
 
     public ChatListAdapter(Context context){
         mInflater = LayoutInflater.from(context);
         mContext = context;
         initTimeZone();
-        mListener = new RecyclerItemClickListener(){
+        mClickListener = new RecyclerItemClickListener(){
             @Override
             public void onClick(View view, int position){
                 startChat(position);
+            }
+        };
+        mLongClickListener = new RecyclerItemLongClickListener(){
+            @Override
+            public void onLongClick(View view, int postion){
+                removeAt(postion);
             }
         };
     }
@@ -85,7 +105,7 @@ public class ChatListAdapter extends RecyclerView.Adapter<ChatListAdapter.ChatVi
     @Override
     public ChatViewHolder onCreateViewHolder(ViewGroup parent, int viewType){
         View itemView = mInflater.inflate(R.layout.item_chat, parent, false);
-        return new ChatViewHolder(itemView, mListener);
+        return new ChatViewHolder(itemView, mClickListener, mLongClickListener);
     }
 
     @Override
@@ -154,6 +174,27 @@ public class ChatListAdapter extends RecyclerView.Adapter<ChatListAdapter.ChatVi
     private void initTimeZone(){
         sdf.setTimeZone(TimeZone.getTimeZone("Asia/Shanghai"));
         sdf_today.setTimeZone(TimeZone.getTimeZone("Asia/Shanghai"));
+    }
+
+    private void removeAt(final int position){
+        AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+        builder.setMessage("是否刪除？").setTitle("刪除聊天记录");
+        builder.setPositiveButton(R.string.Ok, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                Message msg = new Message();
+                msg.what = Constant.REMOVE_CHAT;
+                msg.obj = position;
+                MainActivity.mainMessageHandler.sendMessage(msg);
+            }
+        });
+        builder.setNegativeButton(R.string.Cancel, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+            }
+        });
+        builder.show();
     }
 
     private void startChat(int position){

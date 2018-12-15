@@ -40,14 +40,13 @@ public class LoginActivity extends Activity {
         try {
             if (connectionTool.socket == null || !connectionTool.socket.isConnected())
                 connectionTool.ConnectionInit(ConnectionTool.ServerIP, ConnectionTool.ServerPort, connectionTool.LocalPort);
-            Toast.makeText(this, "连接成功", Toast.LENGTH_SHORT);
+//            Toast.makeText(this, "连接成功", Toast.LENGTH_SHORT).show();
         }
         catch (Exception e){
             Log.v("Error", e.getMessage());
             Toast.makeText(this, "服务器连接失败", Toast.LENGTH_SHORT).show();
             return;
         }
-
 
         try {
             String reply;
@@ -56,8 +55,8 @@ public class LoginActivity extends Activity {
                 public void run(){
                     try{
                         Thread.sleep(2000);
-                    } catch (Exception e){
-
+                    } catch (InterruptedException e){
+                        Thread.currentThread().interrupt();
                     }
                     LoginActivity.timeout = true;
                 }
@@ -67,6 +66,12 @@ public class LoginActivity extends Activity {
                 reply = connectionTool.Login(stunumEditText.getText().toString(),
                         passwordEditText.getText().toString());
             } while(reply.equals("") && !LoginActivity.timeout);//2 second login attempt
+            if (reply.equals("Error")){
+                Toast.makeText(this, "服务器连接失败", Toast.LENGTH_SHORT).show();
+                return;
+            }
+//            sleep.interrupt();
+            LoginActivity.timeout = false;
             if (reply.equals("lol"))//verified
             {
                 Toast.makeText(this, "验证成功", Toast.LENGTH_SHORT).show();
@@ -75,8 +80,9 @@ public class LoginActivity extends Activity {
                 startActivity(intent);
                 my_stunum = stunumEditText.getText().toString();
             }
-            else
-            {
+            else if (reply.isEmpty()){
+                Toast.makeText(this, "登录过于频繁", Toast.LENGTH_SHORT).show();
+            } else {
                 Toast.makeText(this, "验证失败\n" + reply, Toast.LENGTH_SHORT).show();
             }
         }
@@ -95,5 +101,15 @@ public class LoginActivity extends Activity {
             e.printStackTrace();
         }
         super.onDestroy();
+    }
+
+    @Override
+    public void onResume(){
+        super.onResume();
+        try{
+            connectionTool.ConnectionInit(ConnectionTool.ServerIP, ConnectionTool.ServerPort, connectionTool.LocalPort);
+        } catch (Exception e){
+            e.printStackTrace();
+        }
     }
 }

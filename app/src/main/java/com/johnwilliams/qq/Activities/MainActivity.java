@@ -18,39 +18,40 @@ import android.widget.Toast;
 import com.johnwilliams.qq.R;
 import com.johnwilliams.qq.fragments.ChatFragment;
 import com.johnwilliams.qq.fragments.ContactFragment;
-import com.johnwilliams.qq.tools.Chat.ChatViewModel;
-import com.johnwilliams.qq.tools.Connection.ConnectionTool;
+import com.johnwilliams.qq.fragments.SettingFragment;
+import com.johnwilliams.qq.tools.Chat.Chat;
 import com.johnwilliams.qq.tools.Connection.MessageReceiver;
 import com.johnwilliams.qq.tools.Constant;
 import com.johnwilliams.qq.tools.Contact.Contact;
 
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
-import java.util.regex.Pattern;
 
 
 public class MainActivity extends FragmentActivity implements SearchView.OnQueryTextListener, View.OnClickListener {
 
+    // top bar
+    private View top_bar;
     private SearchView searchView;
     private ImageButton add_button;
     //tabs
     private Button[] mTabs;
     private ChatFragment chatFragment;
     private ContactFragment contactFragment;
-    private Fragment settingFragment;
+    private SettingFragment settingFragment;
     private Fragment[] mFragments;
     private int tab_index;
     private int cur_tab_index;
     public static String my_stunum;
 
     public static MessageReceiver messageReceiver = new MessageReceiver();
-    public static ChatListMessageHandler chatListMessageHandler;
+    public static MainMessageHandler mainMessageHandler;
     public static boolean contact_online;
 
-    public static class ChatListMessageHandler extends Handler {
+    public static class MainMessageHandler extends Handler {
         private WeakReference<MainActivity> mActivity;
 
-        public ChatListMessageHandler(MainActivity activity){
+        public MainMessageHandler(MainActivity activity){
             mActivity = new WeakReference<>(activity);
         }
 
@@ -58,9 +59,30 @@ public class MainActivity extends FragmentActivity implements SearchView.OnQuery
         public void handleMessage(Message msg){
             super.handleMessage(msg);
             MainActivity mainActivity = mActivity.get();
-            if (msg.what == ChatActivity.NEW_MESSAGE){
-                // TODO: update database
+            switch (msg.what){
+                case Constant.NEW_MESSAGE:
+                    //TODO
+                    break;
+                case Constant.CLEAR_CHAT:
+                    ((ChatFragment)mainActivity.mFragments[0]).mChatViewModel.clear();
+                    break;
+                case Constant.CLEAR_CONTACT:
+                    ((ContactFragment)mainActivity.mFragments[1]).mContactViewModel.clear();
+                    break;
+                case Constant.REMOVE_CHAT:
+                    int position = (int)msg.obj;
+                    ((ChatFragment)mainActivity.mFragments[0]).mChatViewModel.removeAt(position);
+                    break;
+                case Constant.NEW_CHAT:
+                    Chat chat = (Chat)msg.obj;
+                    ((ChatFragment)mainActivity.mFragments[0]).mChatViewModel.insert(chat);
+                    break;
+                default:
+                    break;
             }
+//            if (msg.what == Constant.NEW_MESSAGE){
+//                // TODO: update database
+//            }
         }
     }
 
@@ -71,10 +93,10 @@ public class MainActivity extends FragmentActivity implements SearchView.OnQuery
         setContentView(R.layout.activity_main);
         initView();
         my_stunum = getIntent().getExtras().getString(Constant.MY_STUNUM_EXTRA);
-        chatListMessageHandler = new ChatListMessageHandler(this);
+        mainMessageHandler = new MainMessageHandler(this);
         try {
             messageReceiver.run();
-            Toast.makeText(this, R.string.server_on, Toast.LENGTH_LONG);
+            Toast.makeText(this, R.string.server_on, Toast.LENGTH_SHORT);
         } catch (Exception e){
             Log.d("ConnectionError", e.getMessage());
         }
@@ -96,6 +118,7 @@ public class MainActivity extends FragmentActivity implements SearchView.OnQuery
     }
 
     protected void initView(){
+        top_bar = findViewById(R.id.top_bar);
         add_button = findViewById(R.id.addFriendButton);
         add_button.setOnClickListener(this);
         searchView = findViewById(R.id.search_friend);
@@ -113,9 +136,11 @@ public class MainActivity extends FragmentActivity implements SearchView.OnQuery
     protected void initTabs(){
         chatFragment = new ChatFragment();
         contactFragment = new ContactFragment();
-        settingFragment = new Fragment();
+        settingFragment = new SettingFragment();
         mFragments = new Fragment[]{chatFragment, contactFragment, settingFragment};
 
+        getSupportFragmentManager().beginTransaction().
+                replace(R.id.fragment_container, contactFragment).commit();
         getSupportFragmentManager().beginTransaction().
                 replace(R.id.fragment_container, chatFragment).commit();
     }
@@ -124,12 +149,15 @@ public class MainActivity extends FragmentActivity implements SearchView.OnQuery
         switch (view.getId()){
             case R.id.tab_chat_btn:
                 tab_index = 0;
+                top_bar.setVisibility(View.VISIBLE);
                 break;
             case R.id.tab_contact_btn:
                 tab_index = 1;
+                top_bar.setVisibility(View.VISIBLE);
                 break;
             case R.id.tab_set_btn:
                 tab_index = 2;
+                top_bar.setVisibility(View.GONE);
                 break;
         }
         if (cur_tab_index != tab_index){
@@ -143,10 +171,10 @@ public class MainActivity extends FragmentActivity implements SearchView.OnQuery
 
     @Override
     public void onBackPressed(){
-        Toast.makeText(this, R.string.test_receive, Toast.LENGTH_LONG).show();
         try {
             if (my_stunum != null){
                 LoginActivity.connectionTool.Logout(my_stunum);
+                LoginActivity.connectionTool.socket.close();
                 LoginActivity.connectionTool.socket = null;
             }
         } catch (Exception e){
@@ -195,6 +223,12 @@ public class MainActivity extends FragmentActivity implements SearchView.OnQuery
                 if (student_number.length() != 10 || !student_number.matches("^[0-9]*$")){
                     wrong_number = true;
                 }
+
+                if (student_number.equals(my_stunum)){
+                    Toast.makeText(this, R.string.add_myself_error, Toast.LENGTH_SHORT).show();
+                    break;
+                }
+
                 String reply = "";
                 if (!wrong_number){
                     try{
@@ -210,12 +244,16 @@ public class MainActivity extends FragmentActivity implements SearchView.OnQuery
                 } else if (reply.matches("^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}↵\n" +
                         "(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$")){
                     wrong_number = false;
+                } else if (reply.equals("Error")){
+                    Toast.makeText(this, R.string.never_signup, Toast.LENGTH_SHORT).show();
+                    break;
                 }
+
                 if (wrong_number){
-                    Toast.makeText(this, R.string.wrong_stunum, Toast.LENGTH_LONG).show();
+                    Toast.makeText(this, R.string.wrong_stunum, Toast.LENGTH_SHORT).show();
                     break;
                 } else if (((ContactFragment)mFragments[1]).mAdapter.getItemCount() != 0){
-                    Toast.makeText(this, R.string.contact_exist, Toast.LENGTH_LONG).show();
+                    Toast.makeText(this, R.string.contact_exist, Toast.LENGTH_SHORT).show();
                     break;
                 }
 
@@ -224,7 +262,7 @@ public class MainActivity extends FragmentActivity implements SearchView.OnQuery
                 builder.setPositiveButton(R.string.Ok, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        ((ContactFragment)mFragments[1]).mAdapter.addContact(new Contact(student_number, "", MainActivity.contact_online));
+                        ((ContactFragment)mFragments[1]).insert(new Contact(student_number, "", MainActivity.contact_online));
                     }
                 });
                 builder.setNegativeButton(R.string.Cancel, new DialogInterface.OnClickListener() {

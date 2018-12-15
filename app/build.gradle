@@ -28,6 +28,7 @@ dependencies {
     def room_version = "1.1.1"
 
     implementation "android.arch.persistence.room:runtime:$room_version"
+//    implementation 'com.android.support:support-v4:28.0.0'
     annotationProcessor "android.arch.persistence.room:compiler:$room_version"
     // use kapt for Kotlin
     //life cycle
@@ -52,9 +53,9 @@ dependencies {
 }
 
 android {
-    sourceSets {
-        main.jniLibs.srcDirs = ['libs']
-    }
+//    sourceSets {
+//        main.jniLibs.srcDirs = ['libs']
+//    }
 
     lintOptions {
         checkReleaseBuilds false

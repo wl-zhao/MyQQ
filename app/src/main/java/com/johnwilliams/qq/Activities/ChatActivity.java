@@ -47,7 +47,6 @@ import java.util.Date;
 public class ChatActivity extends AppCompatActivity implements View.OnClickListener, XListView.IXListViewListener, EventListener {
 
     // Handler Messages
-    public static final int NEW_MESSAGE = 0;
     public static ChatMessageHandler chatMessageHandler;
 
     // Basic info
@@ -99,7 +98,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         public void handleMessage(Message msg){
             super.handleMessage(msg);
             ChatActivity chatActivity = mActivity.get();
-            if (msg.what == NEW_MESSAGE){
+            if (msg.what == Constant.NEW_MESSAGE){
                 chatActivity.initOrRefresh();
                 Toast.makeText(chatActivity, R.string.new_message, Toast.LENGTH_SHORT);
             }
@@ -314,11 +313,11 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
                 if (success){
                     chatMessage.setStatus(ChatMessage.MSG_STATUS.SENT);
-                    Toast.makeText(this, "发送成功", Toast.LENGTH_LONG).show();
+                    Toast.makeText(this, "发送成功", Toast.LENGTH_SHORT).show();
                     edit_user_comment.setText("");
                 } else {
                     chatMessage.setStatus(ChatMessage.MSG_STATUS.FAILED);
-                    Toast.makeText(this, "发送失败", Toast.LENGTH_LONG).show();
+                    Toast.makeText(this, "发送失败", Toast.LENGTH_SHORT).show();
                 }
                 mAdapter.add(chatMessage);
                 mListView.setSelection(mAdapter.getCount() - 1);
@@ -346,7 +345,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         try {
             messageSender.ConnectionInit();
         } catch (Exception e){
-            Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();
+            Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
         }
     }
 

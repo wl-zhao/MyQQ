@@ -1,6 +1,7 @@
 package com.johnwilliams.qq.tools.Connection;
 
 import android.os.AsyncTask;
+import android.os.Handler;
 import android.util.Log;
 
 import java.net.*;
@@ -69,6 +70,7 @@ public class ConnectionTool {
                         return null;
                     }
                     socket = new Socket();
+                    socket.setSoTimeout(2000);
                     socket.setReuseAddress(true);//TODO: important!
 //                    socket.bind(new InetSocketAddress(Integer.parseInt(localPort)));
                     socket.connect(new InetSocketAddress(strings[0], Integer.parseInt(strings[1])));
@@ -103,10 +105,13 @@ public class ConnectionTool {
     }
 
     public String SendCommand(String cmd) throws Exception {
-        AsyncTask<String, Void, String> send = new AsyncTask<String, Void, String>() {
+        final AsyncTask<String, Void, String> send = new AsyncTask<String, Void, String>() {
             @Override
             protected String doInBackground(String... strings) {
                 try{
+                    if (inFromServer == null){
+                        inFromServer = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                    }
                     Arrays.fill(cbuf, '\0');
                     outToServer.write(strings[0]);
                     outToServer.flush();
@@ -114,6 +119,9 @@ public class ConnectionTool {
                 }
                 catch (Exception e){
                     Log.v("Error", e.getMessage());
+                    return "Error";
+//                    inFromServer.close();
+//                    inFromServer = null;
                 }
                 int i = 0;
                 while(cbuf[i++] != '\0');
@@ -121,6 +129,8 @@ public class ConnectionTool {
             }
         };
         return send.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, cmd).get();//TODO, key issue
+
+//        return reply;
 //        String result = send.execute(cmd).get();
 //        return result;
     }

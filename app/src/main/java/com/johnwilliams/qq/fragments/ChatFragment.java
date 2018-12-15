@@ -25,7 +25,7 @@ import java.util.List;
 
 public class ChatFragment extends MyFragment{
     RecyclerView chatList;
-    private ChatViewModel mChatViewModel;
+    public ChatViewModel mChatViewModel;
     public ChatListAdapter mAdapter;
 
     @Override
@@ -38,7 +38,6 @@ public class ChatFragment extends MyFragment{
     public void onActivityCreated(Bundle savedInstanceState){
         super.onActivityCreated(savedInstanceState);
         initView();
-
     }
 
     private void initView(){

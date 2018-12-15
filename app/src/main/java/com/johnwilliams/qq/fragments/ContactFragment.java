@@ -19,7 +19,7 @@ import java.util.List;
 
 public class ContactFragment extends MyFragment{
     RecyclerView contactList;
-    private ContactViewModel mContactViewModel;
+    public ContactViewModel mContactViewModel;
     public ContactListAdapter mAdapter;
 
     @Override
@@ -32,7 +32,6 @@ public class ContactFragment extends MyFragment{
     public void onActivityCreated(Bundle savedInstanceState){
         super.onActivityCreated(savedInstanceState);
         initView();
-
     }
 
     private void initView(){
@@ -47,6 +46,10 @@ public class ContactFragment extends MyFragment{
                 mAdapter.setContacts(contacts);
             }
         });
+    }
+
+    public void insert(Contact contact){
+        mContactViewModel.insert(contact);
     }
 
 //    public void

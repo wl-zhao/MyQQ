@@ -20,8 +20,40 @@ public class ChatRepository {
         return mAllChats;
     }
 
+    public void removeAt(int i){
+        new removeAsyncTask(mChatDao).execute(mAllChats.getValue().get(i));
+    }
+
     public void insert(Chat chat){
         new insertAsyncTask(mChatDao).execute(chat);
+    }
+
+    public void clear(){
+        new clearAsyncTask(mChatDao).execute();
+    }
+
+    private static class removeAsyncTask extends AsyncTask<Chat, Void, Void>{
+        private ChatDao mAsyncTaskDao;
+        removeAsyncTask(ChatDao dao){
+            mAsyncTaskDao = dao;
+        }
+        @Override
+        protected Void doInBackground(final Chat... params){
+            mAsyncTaskDao.delete(params[0]);
+            return null;
+        }
+    }
+
+    private static class clearAsyncTask extends AsyncTask<Void, Void, Void>{
+        private ChatDao mAsyncTaskDao;
+        clearAsyncTask(ChatDao dao){
+            mAsyncTaskDao = dao;
+        }
+        @Override
+        protected Void doInBackground(final Void... params){
+            mAsyncTaskDao.deleteAll();
+            return null;
+        }
     }
 
     private static class insertAsyncTask extends AsyncTask<Chat, Void, Void>{

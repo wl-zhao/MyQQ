@@ -1,6 +1,10 @@
 package com.johnwilliams.qq.tools.Contact;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -10,29 +14,54 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.johnwilliams.qq.Activities.ChatActivity;
+import com.johnwilliams.qq.Activities.MainActivity;
 import com.johnwilliams.qq.R;
+import com.johnwilliams.qq.tools.Chat.Chat;
+import com.johnwilliams.qq.tools.Constant;
+import com.johnwilliams.qq.tools.RecyclerItemClickListener;
+import com.johnwilliams.qq.tools.RecyclerItemLongClickListener;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Date;
 
 public class ContactListAdapter extends RecyclerView.Adapter<ContactListAdapter.ContactViewHolder> {
 
-    class ContactViewHolder extends RecyclerView.ViewHolder{
+    class ContactViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener{
         private final ImageView contact_profile;
         private final TextView contact_name;
         private final TextView online_state;
 
-        private ContactViewHolder(View itemView){
+        private RecyclerItemClickListener mClickListener;
+        private RecyclerItemLongClickListener mLongClickListener;
+
+        private ContactViewHolder(View itemView, RecyclerItemClickListener listener, RecyclerItemLongClickListener longClickListener){
             super(itemView);
             contact_profile = itemView.findViewById(R.id.contact_profile);
             contact_name = itemView.findViewById(R.id.contact_name);
             online_state = itemView.findViewById(R.id.online_state);
+            mClickListener = listener;
+            mLongClickListener = longClickListener;
+            itemView.setOnClickListener(this);
+            itemView.setOnLongClickListener(this);
         }
 
         private void ClearView(){
             contact_profile.setImageDrawable(mContext.getResources().getDrawable(R.drawable.qq));
             contact_name.setText("");
             online_state.setText("");
+        }
+
+        @Override
+        public void onClick(View view){
+            mClickListener.onClick(view, getAdapterPosition());
+        }
+
+        @Override
+        public boolean onLongClick(View view){
+            mLongClickListener.onLongClick(view, getAdapterPosition());
+            return true;
         }
     }
 
@@ -41,16 +70,31 @@ public class ContactListAdapter extends RecyclerView.Adapter<ContactListAdapter.
     private List<Contact> mContactsCopy;
     private Context mContext;
 
+    private RecyclerItemClickListener mClickListener;
+    private RecyclerItemLongClickListener mLongClickListener;
+
     public ContactListAdapter(Context context){
         mInflater = LayoutInflater.from(context);
         mContext = context;
+        mClickListener = new RecyclerItemClickListener() {
+            @Override
+            public void onClick(View view, int position) {
+                startChat(position);
+            }
+        };
+        mLongClickListener = new RecyclerItemLongClickListener() {
+            @Override
+            public void onLongClick(View view, int position) {
+                removeAt(position);
+            }
+        };
     }
 
     @NonNull
     @Override
     public ContactViewHolder onCreateViewHolder(ViewGroup parent, int viewType){
         View itemView = mInflater.inflate(R.layout.item_contact, parent, false);
-        return new ContactViewHolder(itemView);
+        return new ContactViewHolder(itemView, mClickListener, mLongClickListener);
     }
 
     @Override
@@ -86,6 +130,27 @@ public class ContactListAdapter extends RecyclerView.Adapter<ContactListAdapter.
         notifyDataSetChanged();
     }
 
+    private void removeAt(final int position){
+        AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+        builder.setMessage("是否刪除？").setTitle("刪除联系人");
+        builder.setPositiveButton(R.string.Ok, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                Message msg = new Message();
+                msg.what = Constant.REMOVE_CONTACT;
+                msg.obj = position;
+                MainActivity.mainMessageHandler.sendMessage(msg);
+            }
+        });
+        builder.setNegativeButton(R.string.Cancel, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+            }
+        });
+        builder.show();
+    }
+
     @Override
     public int getItemCount(){
         return (mContacts != null) ? mContacts.size() : 0;
@@ -104,5 +169,26 @@ public class ContactListAdapter extends RecyclerView.Adapter<ContactListAdapter.
             }
         }
         notifyDataSetChanged();
+    }
+
+    private void startChat(int position){
+        Contact contact = mContacts.get(position);
+        String friend_stunum = contact.student_number;
+        String friend_name = contact.name;
+
+        // Add new chat
+        Message msg = new Message();
+        msg.what = Constant.NEW_CHAT;
+        Chat chat = new Chat(friend_stunum, friend_name);
+        chat.time = new Date().getTime();
+
+        msg.obj = chat;
+        MainActivity.mainMessageHandler.sendMessage(msg);
+
+        Intent intent = new Intent(mContext, ChatActivity.class);
+        intent.putExtra(Constant.FRIEND_STUNUM_EXTRA, friend_stunum);
+        intent.putExtra(Constant.MY_STUNUM_EXTRA, MainActivity.my_stunum);
+        intent.putExtra(Constant.FRIEND_NAME_EXTRA, friend_name);
+        mContext.startActivity(intent);
     }
 }
