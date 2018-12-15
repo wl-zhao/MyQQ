@@ -2,7 +2,9 @@ package com.johnwilliams.qq.tools.Message;
 
 import java.util.Locale;
 
-public class ChatMessage {
+import cn.bmob.v3.BmobObject;
+
+public class ChatMessage extends BmobObject {
 
     public enum MSG_TYPE{
         CMD(0), TEXT(1), IMG(2), FILE(3), AUDIO(4);

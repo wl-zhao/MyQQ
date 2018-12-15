@@ -1,5 +1,7 @@
 package com.johnwilliams.qq.tools.Connection;
 
+import android.os.Message;
+
 import com.johnwilliams.qq.Activities.ChatActivity;
 import com.johnwilliams.qq.Activities.MainActivity;
 import com.johnwilliams.qq.tools.Constant;
@@ -57,10 +59,18 @@ public class ServerWorkerRunnable implements Runnable{
                 if (mainMessageHandler == null){
                     mainMessageHandler = MainActivity.mainMessageHandler;
                 }
-                if (chatMessageHandler != null)
-                    chatMessageHandler.sendEmptyMessage(Constant.NEW_MESSAGE);
+                Message msg = new Message();
+                msg.what = Constant.NEW_MESSAGE;
+                msg.obj = chatMessage;
+                if (chatMessageHandler != null) {
+                    chatMessageHandler.sendMessage(msg);
+                }
+
+                msg = new Message();
+                msg.what = Constant.NEW_MESSAGE;
+                msg.obj = chatMessage;
                 if (mainMessageHandler != null)
-                    mainMessageHandler.sendEmptyMessage(Constant.NEW_MESSAGE);
+                    mainMessageHandler.sendMessage(msg);
 
                 if (chatMessage.getType() == ChatMessage.MSG_TYPE.CMD &&
                         chatMessage.getContent().equals("BYE")){

@@ -8,6 +8,8 @@ import android.support.annotation.NonNull;
 
 import java.util.Date;
 
+import cn.bmob.v3.BmobObject;
+
 @Entity(tableName = "chats")
 public class Chat {
     @PrimaryKey(autoGenerate = true)

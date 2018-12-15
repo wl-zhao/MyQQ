@@ -23,9 +23,14 @@ import com.johnwilliams.qq.tools.Chat.Chat;
 import com.johnwilliams.qq.tools.Connection.MessageReceiver;
 import com.johnwilliams.qq.tools.Constant;
 import com.johnwilliams.qq.tools.Contact.Contact;
+import com.johnwilliams.qq.tools.Message.ChatMessage;
 
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
+
+import cn.bmob.v3.Bmob;
+import cn.bmob.v3.exception.BmobException;
+import cn.bmob.v3.listener.SaveListener;
 
 
 public class MainActivity extends FragmentActivity implements SearchView.OnQueryTextListener, View.OnClickListener {
@@ -63,6 +68,13 @@ public class MainActivity extends FragmentActivity implements SearchView.OnQuery
             switch (msg.what){
                 case Constant.NEW_MESSAGE:
                     //TODO
+                    ChatMessage chatMessage = (ChatMessage) msg.obj;
+                    chatMessage.save(new SaveListener<String>() {
+                        @Override
+                        public void done(String s, BmobException e) {
+
+                        }
+                    });
                     break;
                 case Constant.CLEAR_CHAT:
                     ((ChatFragment)mainActivity.mFragments[0]).mChatViewModel.clear();
@@ -108,6 +120,11 @@ public class MainActivity extends FragmentActivity implements SearchView.OnQuery
             Toast.makeText(this, R.string.server_on, Toast.LENGTH_SHORT);
         } catch (Exception e){
             Log.d("ConnectionError", e.getMessage());
+        }
+        try{
+            Bmob.initialize(this, "835e4319500866049b722e7565cdc450");
+        } catch (Exception e){
+            e.printStackTrace();
         }
     }
 
