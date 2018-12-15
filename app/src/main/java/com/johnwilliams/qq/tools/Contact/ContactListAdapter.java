@@ -15,6 +15,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.johnwilliams.qq.Activities.ChatActivity;
+import com.johnwilliams.qq.Activities.LoginActivity;
 import com.johnwilliams.qq.Activities.MainActivity;
 import com.johnwilliams.qq.R;
 import com.johnwilliams.qq.tools.Chat.Chat;
@@ -73,6 +74,8 @@ public class ContactListAdapter extends RecyclerView.Adapter<ContactListAdapter.
     private RecyclerItemClickListener mClickListener;
     private RecyclerItemLongClickListener mLongClickListener;
 
+    private boolean contact_online_inited = false;
+
     public ContactListAdapter(Context context){
         mInflater = LayoutInflater.from(context);
         mContext = context;
@@ -121,6 +124,10 @@ public class ContactListAdapter extends RecyclerView.Adapter<ContactListAdapter.
     public void setContacts(List<Contact> contacts){
         mContacts = contacts;
         mContactsCopy = new ArrayList<>(mContacts);
+        if (!contact_online_inited){
+            contact_online_inited = true;
+            refresh();
+        }
         notifyDataSetChanged();
     }
 
@@ -190,5 +197,20 @@ public class ContactListAdapter extends RecyclerView.Adapter<ContactListAdapter.
         intent.putExtra(Constant.MY_STUNUM_EXTRA, MainActivity.my_stunum);
         intent.putExtra(Constant.FRIEND_NAME_EXTRA, friend_name);
         mContext.startActivity(intent);
+    }
+
+    public void refresh(){
+        try {
+            for (Contact contact : mContactsCopy){
+                String reply = LoginActivity.connectionTool.getIp(contact.student_number);
+                contact.online = reply.matches(Constant.IPV4_REGEX);
+                Message msg = new Message();
+                msg.what = Constant.UPDATE_CONTACT;
+                msg.obj = contact;
+                MainActivity.mainMessageHandler.sendMessage(msg);
+            }
+        } catch (Exception e){
+            e.printStackTrace();
+        }
     }
 }

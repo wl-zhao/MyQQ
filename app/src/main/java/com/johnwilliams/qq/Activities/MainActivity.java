@@ -59,6 +59,7 @@ public class MainActivity extends FragmentActivity implements SearchView.OnQuery
         public void handleMessage(Message msg){
             super.handleMessage(msg);
             MainActivity mainActivity = mActivity.get();
+            int position;
             switch (msg.what){
                 case Constant.NEW_MESSAGE:
                     //TODO
@@ -70,12 +71,20 @@ public class MainActivity extends FragmentActivity implements SearchView.OnQuery
                     ((ContactFragment)mainActivity.mFragments[1]).mContactViewModel.clear();
                     break;
                 case Constant.REMOVE_CHAT:
-                    int position = (int)msg.obj;
+                    position = (int)msg.obj;
                     ((ChatFragment)mainActivity.mFragments[0]).mChatViewModel.removeAt(position);
+                    break;
+                case Constant.REMOVE_CONTACT:
+                    position = (int)msg.obj;
+                    ((ContactFragment)mainActivity.mFragments[1]).mContactViewModel.removeAt(position);
                     break;
                 case Constant.NEW_CHAT:
                     Chat chat = (Chat)msg.obj;
                     ((ChatFragment)mainActivity.mFragments[0]).mChatViewModel.insert(chat);
+                    break;
+                case Constant.UPDATE_CONTACT:
+                    Contact contact = (Contact)msg.obj;
+                    ((ContactFragment)mainActivity.mFragments[1]).mContactViewModel.update(contact);
                     break;
                 default:
                     break;
@@ -220,7 +229,7 @@ public class MainActivity extends FragmentActivity implements SearchView.OnQuery
                 contact_online = true;
                 final String student_number = searchView.getQuery().toString();
                 boolean wrong_number = false;
-                if (student_number.length() != 10 || !student_number.matches("^[0-9]*$")){
+                if (student_number.length() != 10 || !student_number.matches(Constant.STU_NUM_REGEX)){
                     wrong_number = true;
                 }
 
@@ -241,8 +250,7 @@ public class MainActivity extends FragmentActivity implements SearchView.OnQuery
                     contact_online = false;
                 } else if (reply.equals("Incorrect No.")){
                     wrong_number = true;
-                } else if (reply.matches("^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}↵\n" +
-                        "(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$")){
+                } else if (reply.matches(Constant.IPV4_REGEX)){
                     wrong_number = false;
                 } else if (reply.equals("Error")){
                     Toast.makeText(this, R.string.never_signup, Toast.LENGTH_SHORT).show();
@@ -262,7 +270,7 @@ public class MainActivity extends FragmentActivity implements SearchView.OnQuery
                 builder.setPositiveButton(R.string.Ok, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        ((ContactFragment)mFragments[1]).insert(new Contact(student_number, "", MainActivity.contact_online));
+                        ((ContactFragment)mFragments[1]).mContactViewModel.insert(new Contact(student_number, "", MainActivity.contact_online));
                     }
                 });
                 builder.setNegativeButton(R.string.Cancel, new DialogInterface.OnClickListener() {

@@ -46,11 +46,6 @@ public class ContactFragment extends MyFragment{
                 mAdapter.setContacts(contacts);
             }
         });
+        mAdapter.refresh();
     }
-
-    public void insert(Contact contact){
-        mContactViewModel.insert(contact);
-    }
-
-//    public void
 }

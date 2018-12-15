@@ -4,6 +4,10 @@ import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.LiveData;
 
+import com.johnwilliams.qq.Activities.LoginActivity;
+import com.johnwilliams.qq.tools.Connection.ConnectionTool;
+import com.johnwilliams.qq.tools.Constant;
+
 import java.util.List;
 
 public class ContactViewModel extends AndroidViewModel {
@@ -20,11 +24,31 @@ public class ContactViewModel extends AndroidViewModel {
         return mAllContacts;
     }
 
+//    public void refresh(){
+//        try {
+//            for (Contact contact : mAllContacts.getValue()){
+//                String reply = LoginActivity.connectionTool.getIp(contact.student_number);
+//                contact.online = reply.matches(Constant.IPV4_REGEX);
+//                mRepository.update(contact);
+//            }
+//        } catch (Exception e){
+//            e.printStackTrace();
+//        }
+//    }
+
+    public void update(Contact contact){
+        mRepository.update(contact);
+    }
+
     public void insert(Contact chat){
         mRepository.insert(chat);
     }
 
     public void clear(){
         mRepository.clear();
+    }
+
+    public void removeAt(int position){
+        mRepository.removeAt(position);
     }
 }

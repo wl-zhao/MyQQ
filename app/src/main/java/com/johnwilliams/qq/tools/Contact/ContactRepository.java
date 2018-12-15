@@ -20,12 +20,44 @@ public class ContactRepository {
         return mAllContacts;
     }
 
+    public void removeAt(int i){
+        new removeAsyncTask(mContactDao).execute(mAllContacts.getValue().get(i));
+    }
+
+    public void update(Contact contact){
+        new updateAsyncTask(mContactDao).execute(contact);
+    }
+
     public void insert(Contact contact){
         new insertAsyncTask(mContactDao).execute(contact);
     }
 
     public void clear(){
         new clearAsyncTask(mContactDao).execute();
+    }
+
+    private static class removeAsyncTask extends AsyncTask<Contact, Void, Void>{
+        private ContactDao mAsyncTaskDao;
+        removeAsyncTask(ContactDao dao){
+            mAsyncTaskDao = dao;
+        }
+        @Override
+        protected Void doInBackground(final Contact... params){
+            mAsyncTaskDao.delete(params[0]);
+            return null;
+        }
+    }
+
+    private static class updateAsyncTask extends AsyncTask<Contact, Void, Void>{
+        private ContactDao mAsyncTaskDao;
+        updateAsyncTask(ContactDao dao){
+            mAsyncTaskDao = dao;
+        }
+        @Override
+        protected Void doInBackground(final Contact... params){
+            mAsyncTaskDao.update(params[0]);
+            return null;
+        }
     }
 
     private static class clearAsyncTask extends AsyncTask<Void, Void, Void>{
