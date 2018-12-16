@@ -17,6 +17,7 @@ public class ServerWorkerRunnable implements Runnable{
     private volatile List<ChatMessage> results = new ArrayList<>();
     private ChatActivity.ChatMessageHandler chatMessageHandler;
     private MainActivity.MainMessageHandler mainMessageHandler;
+    private boolean isStopped = false;
 
     public ServerWorkerRunnable(Socket clientSocket){
         initWithSocket(clientSocket);
@@ -24,6 +25,7 @@ public class ServerWorkerRunnable implements Runnable{
 
     public void initWithSocket(Socket clientSocket){
         this.clientSocket = clientSocket;
+        isStopped = false;
     }
 
     @Override
@@ -39,6 +41,9 @@ public class ServerWorkerRunnable implements Runnable{
             while(true){
                 result = new StringBuilder();
                 input.read(length_info);// read whole length of message
+                if (isStopped){
+                    break;
+                }
                 result.append(String.valueOf(length_info));
                 int length = Integer.parseInt(result.toString());
                 while (result.length() < length){
@@ -50,38 +55,38 @@ public class ServerWorkerRunnable implements Runnable{
                 output.flush();
                 System.out.println(result);
                 chatMessage = new ChatMessage(result.toString());
-                results.add(chatMessage);
-
-                // Send message using handler
-                if (chatMessageHandler == null) {
-                    chatMessageHandler = ChatActivity.chatMessageHandler;
-                }
-                if (mainMessageHandler == null){
-                    mainMessageHandler = MainActivity.mainMessageHandler;
-                }
-                Message msg = new Message();
-                msg.what = Constant.NEW_MESSAGE;
-                msg.obj = chatMessage;
-                if (chatMessageHandler != null) {
-                    chatMessageHandler.sendMessage(msg);
-                }
-
-                msg = new Message();
-                msg.what = Constant.NEW_MESSAGE;
-                msg.obj = chatMessage;
-                if (mainMessageHandler != null)
-                    mainMessageHandler.sendMessage(msg);
 
                 if (chatMessage.getType() == ChatMessage.MSG_TYPE.CMD &&
                         chatMessage.getContent().equals("BYE")){
                     break;
                 }
+                results.add(chatMessage);
+
+                // Send message using handler
+                Message msg = new Message();
+                msg.what = Constant.NEW_MESSAGE;
+                msg.obj = chatMessage;
+                if (ChatActivity.chatMessageHandler != null) {
+                    ChatActivity.chatMessageHandler.sendMessage(msg);
+                }
+
+                msg = new Message();
+                msg.what = Constant.NEW_MESSAGE;
+                msg.obj = chatMessage;
+                if (MainActivity.mainMessageHandler != null)
+                    MainActivity.mainMessageHandler.sendMessage(msg);
+
+
             }
             input.close();
             output.close();
         } catch (Exception e){
             e.printStackTrace();
         }
+    }
+
+    public synchronized void stop(){
+        isStopped = true;
     }
 
     public synchronized List<ChatMessage> getResults(){

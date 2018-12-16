@@ -86,6 +86,7 @@ public class MessageReceiver implements Runnable{
         try {
             if (serverSocket != null){
                 serverSocket.close();
+                serverWorkerRunnable.stop();
                 serverSocket = null;
             }
         } catch (IOException e){

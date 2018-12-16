@@ -199,9 +199,11 @@ public class MainActivity extends FragmentActivity implements SearchView.OnQuery
     public void onBackPressed(){
         try {
             if (my_stunum != null){
+                messageReceiver.stop();
                 LoginActivity.connectionTool.Logout(my_stunum);
                 LoginActivity.connectionTool.socket.close();
                 LoginActivity.connectionTool.socket = null;
+//                mainMessageHandler = null;
             }
         } catch (Exception e){
 
@@ -211,7 +213,7 @@ public class MainActivity extends FragmentActivity implements SearchView.OnQuery
 
     @Override
     public void onDestroy(){
-        messageReceiver.stop();
+//        messageReceiver.stop();
         super.onDestroy();
     }
 
