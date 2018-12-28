@@ -1,9 +1,15 @@
 package com.johnwilliams.qq.tools.Connection;
 
+import android.icu.util.Output;
+import android.net.Uri;
 import android.util.Log;
 
 import com.johnwilliams.qq.Activities.LoginActivity;
 import com.johnwilliams.qq.tools.Message.ChatMessage;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.OutputStream;
 
 public class MessageSender extends ConnectionTool {
 
@@ -42,6 +48,18 @@ public class MessageSender extends ConnectionTool {
         } catch (Exception e){
             Log.v("SendError", e.getMessage());
         }
+        return false;
+    }
+
+    public boolean SendFile(String localPath, ChatMessage message) throws Exception{
+        FileInputStream fileInput = new FileInputStream(localPath);
+        int size = -1;
+        byte [] buffer = new byte[1024];
+        while ((size = fileInput.read(buffer, 0, 1024)) != -1){
+            //outputData.write(buffer, 0, size);
+        }
+        //outputData.close();
+        fileInput.close();
         return false;
     }
 

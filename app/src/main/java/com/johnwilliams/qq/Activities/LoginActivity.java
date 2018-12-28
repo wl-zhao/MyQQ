@@ -12,6 +12,7 @@ import android.widget.Toast;
 import com.johnwilliams.qq.R;
 import com.johnwilliams.qq.tools.Connection.ConnectionTool;
 import com.johnwilliams.qq.tools.Constant;
+import com.johnwilliams.qq.tools.PermissionManager;
 
 
 public class LoginActivity extends Activity {

@@ -1,9 +1,12 @@
 package com.johnwilliams.qq.tools.Connection;
 
 import android.os.AsyncTask;
+import android.os.Message;
 import android.util.Log;
 import android.widget.ListView;
 
+import com.johnwilliams.qq.Activities.ChatActivity;
+import com.johnwilliams.qq.tools.Constant;
 import com.johnwilliams.qq.tools.Message.ChatMessage;
 
 import java.io.IOException;
@@ -11,7 +14,15 @@ import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+import cn.bmob.v3.BmobObject;
+import cn.bmob.v3.BmobQuery;
+import cn.bmob.v3.datatype.BmobQueryResult;
+import cn.bmob.v3.exception.BmobException;
+import cn.bmob.v3.listener.FindListener;
+import cn.bmob.v3.listener.SQLQueryListener;
 
 public class MessageReceiver implements Runnable{
     public List<ChatMessage> unread_msgs;
@@ -38,6 +49,37 @@ public class MessageReceiver implements Runnable{
 
     public ChatMessage get(int position){
         return unread_msgs.get(position);
+    }
+
+    static public void fetchMessages(String my_stunum, String friend_stunum){
+        final List<ChatMessage> chatMessages = new ArrayList<>();
+        // fetch from bmob server
+        String bql = "select * from ChatMessage where (from_stunum = ? and to_stunum = ?) " +
+                "or (from_stunum = ? and to_stunum = ?)";
+        BmobQuery<ChatMessage> chatMessageBmobQuery = new BmobQuery<>();
+        chatMessageBmobQuery.doSQLQuery(bql, new SQLQueryListener<ChatMessage>() {
+            @Override
+            public void done(BmobQueryResult<ChatMessage> bmobQueryResult, BmobException e) {
+                if (e == null){
+                    List<ChatMessage> list = (List<ChatMessage>) bmobQueryResult.getResults();
+                    if (list != null && list.size() > 0){
+                        chatMessages.addAll(list);
+                        Message msg = new Message();
+                        msg.what = Constant.LOAD_DONE;
+                        msg.obj = chatMessages;
+                        ChatActivity.chatMessageHandler.sendMessage(msg);
+                    }
+                }
+            }
+        }, my_stunum, friend_stunum, friend_stunum, my_stunum);
+        // sort by time
+        Comparator<ChatMessage> comparator = new Comparator<ChatMessage>() {
+            @Override
+            public int compare(ChatMessage o1, ChatMessage o2) {
+                return o1.getTime().compareTo(o2.getTime());
+            }
+        };
+        Collections.sort(chatMessages, comparator);
     }
 
     @Override

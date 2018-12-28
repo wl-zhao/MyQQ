@@ -33,9 +33,10 @@ public class ChatMessage extends BmobObject {
     final public static int STUNUM_LENGTH = 10;
 
     public static String default_num = "0000000000";
-    private String from = default_num;
-    private String to = default_num;
+    private String from_stunum = default_num;
+    private String to_stunum = default_num;
     private String content = "";
+
     private Long time = 0L;
     private MSG_TYPE type = MSG_TYPE.TEXT;
     private MSG_STATUS status = MSG_STATUS.SENDING;
@@ -50,9 +51,9 @@ public class ChatMessage extends BmobObject {
         fromString(str);
     }
 
-    public ChatMessage(String from, String to, String content, Long time, MSG_TYPE type, MSG_STATUS status){
-        this.from = from;
-        this.to = to;
+    public ChatMessage(String from_stunum, String to, String content, Long time, MSG_TYPE type, MSG_STATUS status){
+        this.from_stunum = from_stunum;
+        this.to_stunum = to;
         this.content = content;
         this.time = time;
         this.type = type;
@@ -62,8 +63,8 @@ public class ChatMessage extends BmobObject {
     @Override
     public String toString(){
         String bytes = "";
-        // from and to
-        bytes += from + to;
+        // from_stunum and to_stunum
+        bytes += from_stunum + to_stunum;
         // type
         bytes += String.valueOf(type.getValue());
         // time
@@ -83,29 +84,29 @@ public class ChatMessage extends BmobObject {
     public void fromString(String s){
         int cursor = 0;
         int content_length = Integer.parseInt(s.substring(cursor, cursor += 3));
-        from = s.substring(cursor, cursor += STUNUM_LENGTH);//TODO: maybe wrong
-        to = s.substring(cursor, cursor += STUNUM_LENGTH);
+        from_stunum = s.substring(cursor, cursor += STUNUM_LENGTH);//TODO: maybe wrong
+        to_stunum = s.substring(cursor, cursor += STUNUM_LENGTH);
         type = MSG_TYPE.values()[Integer.parseInt(s.substring(cursor, cursor += 1))];
         int time_length = Integer.parseInt(s.substring(cursor, cursor += 2));
         time = Long.parseLong(s.substring(cursor, cursor += time_length));
         content = s.substring(cursor, s.length());
     }
 
-    public String getFrom() {
-        return from;
+    public String getFrom_stunum() {
+        return from_stunum;
     }
 
-    public void setFrom(String from) {
-        this.from = from;
+    public void setFrom_stunum(String from_stunum) {
+        this.from_stunum = from_stunum;
     }
 
 
-    public String getTo() {
-        return to;
+    public String getTo_stunum() {
+        return to_stunum;
     }
 
-    public void setTo(String to) {
-        this.to = to;
+    public void setTo_stunum(String to_stunum) {
+        this.to_stunum = to_stunum;
     }
 
 

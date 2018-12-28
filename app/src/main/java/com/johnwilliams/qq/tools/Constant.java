@@ -13,5 +13,6 @@ public class Constant {
     public final static int REMOVE_CONTACT = 4;
     public final static int NEW_CHAT = 5;
     public final static int UPDATE_CONTACT = 6;
+    public final static int LOAD_DONE = 7;
     public final static int DO_NOTHING = -1;
 }

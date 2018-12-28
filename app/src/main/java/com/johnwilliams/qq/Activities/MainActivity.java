@@ -67,15 +67,17 @@ public class MainActivity extends FragmentActivity implements SearchView.OnQuery
             int position;
             switch (msg.what){
                 case Constant.NEW_MESSAGE:
-                    //TODO
-                    ChatMessage chatMessage = (ChatMessage) msg.obj;
-                    chatMessage.save(new SaveListener<String>() {
-                        @Override
-                        public void done(String s, BmobException e) {
-
-                        }
-                    });
                     break;
+                    //TODO
+//                    ChatMessage chatMessage = (ChatMessage) msg.obj;
+//                    chatMessage.setStatus(ChatMessage.MSG_STATUS.SENT);
+//                    chatMessage.save(new SaveListener<String>() {
+//                        @Override
+//                        public void done(String s, BmobException e) {
+//
+//                        }
+//                    });
+//                    break;
                 case Constant.CLEAR_CHAT:
                     ((ChatFragment)mainActivity.mFragments[0]).mChatViewModel.clear();
                     break;

@@ -49,7 +49,6 @@ public class ServerWorkerRunnable implements Runnable{
                 while (result.length() < length){
                     bytesRead = input.read(messageBuffer);
                     result.append(new String(messageBuffer, 0, bytesRead));
-                    StringBuilder s;
                 }
                 output.write("ACK");
                 output.flush();

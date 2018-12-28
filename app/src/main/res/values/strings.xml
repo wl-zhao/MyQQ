@@ -19,6 +19,7 @@
     <string name="picture">照片</string>
     <string name="camera">拍摄</string>
     <string name="location">位置</string>
+    <string name="file">文件</string>
     <string name="add_avator">头像</string>
     <string name="new_message">新消息</string>
     <string name="server_on">服务器启动</string>

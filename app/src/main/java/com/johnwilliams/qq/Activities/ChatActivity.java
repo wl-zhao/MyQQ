@@ -1,9 +1,13 @@
 package com.johnwilliams.qq.Activities;
 
 import android.app.Activity;
+import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Handler;
 import android.os.Message;
+import android.provider.MediaStore;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -33,10 +37,15 @@ import com.johnwilliams.qq.lib.EmoticonsEditText.EmoticonsEditText;
 import com.johnwilliams.qq.lib.Emoj.FaceText;
 import com.johnwilliams.qq.lib.Emoj.FaceTextUtils;
 import com.johnwilliams.qq.lib.XListView.XListView;
+import com.johnwilliams.qq.tools.Connection.MessageReceiver;
 import com.johnwilliams.qq.tools.Connection.MessageSender;
 import com.johnwilliams.qq.tools.Constant;
 import com.johnwilliams.qq.tools.Message.ChatMessage;
 import com.johnwilliams.qq.tools.Message.MessageAdapter;
+import com.johnwilliams.qq.tools.PermissionManager;
+import com.johnwilliams.qq.tools.URIConverter;
+
+import org.w3c.dom.Text;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -78,10 +87,14 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     private TextView tv_picture;
     private TextView tv_camera;
     private TextView tv_location;
+    private TextView tv_file;
     private TextView tv_voice_tips;
     private ImageView iv_record;
 
     private Drawable[] drawable_Anims;
+
+    // read file
+    private static final int READ_REQUEST_CODE = 42;
 
     // Input EditText
     EmoticonsEditText edit_user_comment;
@@ -98,9 +111,14 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         public void handleMessage(Message msg){
             super.handleMessage(msg);
             ChatActivity chatActivity = mActivity.get();
-            if (msg.what == Constant.NEW_MESSAGE){
-                chatActivity.initOrRefresh();
-                Toast.makeText(chatActivity, R.string.new_message, Toast.LENGTH_SHORT);
+            switch (msg.what){
+                case Constant.NEW_MESSAGE:
+                    chatActivity.initOrRefresh();
+                    Toast.makeText(chatActivity, R.string.new_message, Toast.LENGTH_SHORT);
+                    break;
+                case Constant.LOAD_DONE:
+                    chatActivity.mAdapter.addAll((List<ChatMessage>)msg.obj);
+                    break;
             }
         }
     }
@@ -111,6 +129,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_chat);
         initData();
         initView();
+        PermissionManager.CheckReadPermission(this);
     }
 
     @Override
@@ -149,6 +168,8 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         initBottomView();
         initXListView();
     }
+
+
 
     private void initBottomView() {
         btn_chat_add = findViewById(R.id.btn_chat_add);
@@ -203,7 +224,12 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void initAddView(){
-
+        tv_picture = findViewById(R.id.tv_picture);
+        tv_camera = findViewById(R.id.tv_camera);
+        tv_file = findViewById(R.id.tv_file);
+        tv_picture.setOnClickListener(this);
+        tv_camera.setOnClickListener(this);
+        tv_file.setOnClickListener(this);
     }
 
     List<FaceText> emojs;
@@ -259,14 +285,9 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     
     private void initXListView(){
         mListView.setPullLoadEnable(false);
-
         mListView.setPullRefreshEnable(true);
-
         mListView.setXListViewListener(this);
         mListView.setDividerHeight(0);
-
-        initOrRefresh();
-        mListView.setSelection(mAdapter.getCount() - 1);
         mListView.setOnTouchListener(new View.OnTouchListener() {
 
             @Override
@@ -288,6 +309,8 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                 return false;
             }
         });
+        initOrRefresh();
+        mListView.setSelection(mAdapter.getCount() - 1);
     }
 
     @Override
@@ -297,7 +320,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onLoadMore(){
-
+        initOrRefresh();
     }
 
     @Override
@@ -322,6 +345,25 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                 mAdapter.add(chatMessage);
                 mListView.setSelection(mAdapter.getCount() - 1);
                 break;
+            case R.id.btn_chat_add:
+                if (layout_more.getVisibility() == View.GONE){
+                    layout_more.setVisibility(View.VISIBLE);
+                    layout_add.setVisibility(View.VISIBLE);
+                    layout_emoj.setVisibility(View.GONE);
+
+                } else {
+                    if (layout_emoj.getVisibility() == View.VISIBLE){
+                        layout_emoj.setVisibility(View.GONE);
+                        layout_add.setVisibility(View.VISIBLE);
+                    } else {
+                        layout_more.setVisibility(View.GONE);
+                    }
+                }
+                break;
+            case R.id.tv_file:
+                Toast.makeText(this, "load file", Toast.LENGTH_LONG).show();
+                performFileSearch();
+                break;
         }
     }
 
@@ -333,6 +375,14 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
         }
         super.onDestroy();
+    }
+
+    public void hideSoftInputView() {
+        InputMethodManager manager = ((InputMethodManager) this.getSystemService(Activity.INPUT_METHOD_SERVICE));
+        if (getWindow().getAttributes().softInputMode != WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN) {
+            if (getCurrentFocus() != null)
+                manager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+        }
     }
 
     void initData(){
@@ -370,10 +420,48 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     List<ChatMessage> initMsg(){
-        List<ChatMessage> list = new ArrayList<>();
-        list.add(new ChatMessage(my_stunum, friend_stunum, "佳佳我爱你", new Date().getTime(), ChatMessage.MSG_TYPE.TEXT, ChatMessage.MSG_STATUS.SENT));
-        list.add(new ChatMessage(friend_name, my_stunum, "亮亮我爱你", new Date().getTime(), ChatMessage.MSG_TYPE.TEXT, ChatMessage.MSG_STATUS.SENDING));
-        return list;
+        MessageReceiver.fetchMessages(my_stunum, friend_stunum);
+        return new ArrayList<>();
     }
 
+    public void performFileSearch(){
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        intent.setType("*/*");
+        startActivityForResult(intent, READ_REQUEST_CODE);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent resultData){
+        if (requestCode == READ_REQUEST_CODE && resultCode == Activity.RESULT_OK){
+            Uri uri = null;
+            if (resultData != null){
+                uri = resultData.getData();
+                String localPath = URIConverter.getPathFromUri(this, uri);
+                Toast.makeText(this, localPath, Toast.LENGTH_LONG).show();
+                // TODO: send files
+                ChatMessage chatMessage = new ChatMessage(my_stunum, friend_stunum, uri.toString(), new Date().getTime(),
+                        ChatMessage.MSG_TYPE.FILE, ChatMessage.MSG_STATUS.SENDING);
+                try{
+                    messageSender.SendFile(localPath, chatMessage);
+                } catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    private String getLocalPath(Uri uri){
+        String localPath = null;
+        try {
+            Cursor cursor = getContentResolver().query(uri, null, null, null, null);
+            cursor.moveToFirst();
+            int columnIndex = cursor.getColumnIndex(MediaStore.Images.Media.DATA);
+            localPath = cursor.getString(columnIndex);
+            cursor.close();
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+        return localPath;
+    }
 }

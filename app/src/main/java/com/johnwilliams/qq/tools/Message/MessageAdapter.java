@@ -43,7 +43,7 @@ public class MessageAdapter extends BaseListAdapter<ChatMessage> {
     @Override
     public int getItemViewType(int position){
         ChatMessage msg = list.get(position);
-        int offset = MainActivity.my_stunum.equals(msg.getFrom()) ? 4 : 0;
+        int offset = MainActivity.my_stunum.equals(msg.getFrom_stunum()) ? 4 : 0;
         return msg.getType().getValue() + offset;
     }
 
@@ -58,17 +58,17 @@ public class MessageAdapter extends BaseListAdapter<ChatMessage> {
             case CMD:
                 return null;
             case IMG:
-                return MainActivity.my_stunum.equals(msg.getFrom()) ? //send
+                return MainActivity.my_stunum.equals(msg.getFrom_stunum()) ? //send
                         mInflater.inflate(R.layout.item_chat_sent_image, null) :
                         mInflater.inflate(R.layout.item_chat_received_image, null);
             case FILE:
                 return null;
             case TEXT:
-                return MainActivity.my_stunum.equals(msg.getFrom()) ? //send
+                return MainActivity.my_stunum.equals(msg.getFrom_stunum()) ? //send
                         mInflater.inflate(R.layout.item_chat_sent_message, null) :
                         mInflater.inflate(R.layout.item_chat_received_message, null);
             case AUDIO:
-                return MainActivity.my_stunum.equals(msg.getFrom()) ? //send
+                return MainActivity.my_stunum.equals(msg.getFrom_stunum()) ? //send
                         mInflater.inflate(R.layout.item_chat_sent_voice, null) :
                         mInflater.inflate(R.layout.item_chat_received_voice, null);
             default:
