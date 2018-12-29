@@ -12,14 +12,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.johnwilliams.qq.Activities.ChatActivity;
 import com.johnwilliams.qq.Activities.LoginActivity;
 import com.johnwilliams.qq.Activities.MainActivity;
 import com.johnwilliams.qq.R;
 import com.johnwilliams.qq.tools.Chat.Chat;
-import com.johnwilliams.qq.tools.Constant;
+import com.johnwilliams.qq.tools.Utils;
 import com.johnwilliams.qq.tools.RecyclerItemClickListener;
 import com.johnwilliams.qq.tools.RecyclerItemLongClickListener;
 
@@ -144,7 +143,7 @@ public class ContactListAdapter extends RecyclerView.Adapter<ContactListAdapter.
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 Message msg = new Message();
-                msg.what = Constant.REMOVE_CONTACT;
+                msg.what = Utils.REMOVE_CONTACT;
                 msg.obj = position;
                 MainActivity.mainMessageHandler.sendMessage(msg);
             }
@@ -185,7 +184,7 @@ public class ContactListAdapter extends RecyclerView.Adapter<ContactListAdapter.
 
         // Add new chat
         Message msg = new Message();
-        msg.what = Constant.NEW_CHAT;
+        msg.what = Utils.NEW_CHAT;
         Chat chat = new Chat(friend_stunum, friend_name);
         chat.time = new Date().getTime();
 
@@ -193,9 +192,9 @@ public class ContactListAdapter extends RecyclerView.Adapter<ContactListAdapter.
         MainActivity.mainMessageHandler.sendMessage(msg);
 
         Intent intent = new Intent(mContext, ChatActivity.class);
-        intent.putExtra(Constant.FRIEND_STUNUM_EXTRA, friend_stunum);
-        intent.putExtra(Constant.MY_STUNUM_EXTRA, MainActivity.my_stunum);
-        intent.putExtra(Constant.FRIEND_NAME_EXTRA, friend_name);
+        intent.putExtra(Utils.FRIEND_STUNUM_EXTRA, friend_stunum);
+        intent.putExtra(Utils.MY_STUNUM_EXTRA, MainActivity.my_stunum);
+        intent.putExtra(Utils.FRIEND_NAME_EXTRA, friend_name);
         mContext.startActivity(intent);
     }
 
@@ -203,9 +202,9 @@ public class ContactListAdapter extends RecyclerView.Adapter<ContactListAdapter.
         try {
             for (Contact contact : mContactsCopy){
                 String reply = LoginActivity.connectionTool.getIp(contact.student_number);
-                contact.online = reply.matches(Constant.IPV4_REGEX);
+                contact.online = reply.matches(Utils.IPV4_REGEX);
                 Message msg = new Message();
-                msg.what = Constant.UPDATE_CONTACT;
+                msg.what = Utils.UPDATE_CONTACT;
                 msg.obj = contact;
                 MainActivity.mainMessageHandler.sendMessage(msg);
             }

@@ -21,9 +21,10 @@ import com.johnwilliams.qq.fragments.ContactFragment;
 import com.johnwilliams.qq.fragments.SettingFragment;
 import com.johnwilliams.qq.tools.Chat.Chat;
 import com.johnwilliams.qq.tools.Connection.MessageReceiver;
-import com.johnwilliams.qq.tools.Constant;
-import com.johnwilliams.qq.tools.Contact.Contact;
 import com.johnwilliams.qq.tools.Message.ChatMessage;
+import com.johnwilliams.qq.tools.Utils;
+import com.johnwilliams.qq.tools.Contact.Contact;
+import com.johnwilliams.qq.tools.PermissionManager;
 
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
@@ -66,44 +67,43 @@ public class MainActivity extends FragmentActivity implements SearchView.OnQuery
             MainActivity mainActivity = mActivity.get();
             int position;
             switch (msg.what){
-                case Constant.NEW_MESSAGE:
-                    break;
+                case Utils.NEW_MESSAGE:
                     //TODO
-//                    ChatMessage chatMessage = (ChatMessage) msg.obj;
-//                    chatMessage.setStatus(ChatMessage.MSG_STATUS.SENT);
-//                    chatMessage.save(new SaveListener<String>() {
-//                        @Override
-//                        public void done(String s, BmobException e) {
-//
-//                        }
-//                    });
-//                    break;
-                case Constant.CLEAR_CHAT:
+                    ChatMessage chatMessage = (ChatMessage) msg.obj;
+                    chatMessage.setStatus(ChatMessage.MSG_STATUS.SENT);
+                    chatMessage.save(new SaveListener<String>() {
+                        @Override
+                        public void done(String s, BmobException e) {
+
+                        }
+                    });
+                    break;
+                case Utils.CLEAR_CHAT:
                     ((ChatFragment)mainActivity.mFragments[0]).mChatViewModel.clear();
                     break;
-                case Constant.CLEAR_CONTACT:
+                case Utils.CLEAR_CONTACT:
                     ((ContactFragment)mainActivity.mFragments[1]).mContactViewModel.clear();
                     break;
-                case Constant.REMOVE_CHAT:
+                case Utils.REMOVE_CHAT:
                     position = (int)msg.obj;
                     ((ChatFragment)mainActivity.mFragments[0]).mChatViewModel.removeAt(position);
                     break;
-                case Constant.REMOVE_CONTACT:
+                case Utils.REMOVE_CONTACT:
                     position = (int)msg.obj;
                     ((ContactFragment)mainActivity.mFragments[1]).mContactViewModel.removeAt(position);
                     break;
-                case Constant.NEW_CHAT:
+                case Utils.NEW_CHAT:
                     Chat chat = (Chat)msg.obj;
                     ((ChatFragment)mainActivity.mFragments[0]).mChatViewModel.insert(chat);
                     break;
-                case Constant.UPDATE_CONTACT:
+                case Utils.UPDATE_CONTACT:
                     Contact contact = (Contact)msg.obj;
                     ((ContactFragment)mainActivity.mFragments[1]).mContactViewModel.update(contact);
                     break;
                 default:
                     break;
             }
-//            if (msg.what == Constant.NEW_MESSAGE){
+//            if (msg.what == Utils.NEW_MESSAGE){
 //                // TODO: update database
 //            }
         }
@@ -115,7 +115,7 @@ public class MainActivity extends FragmentActivity implements SearchView.OnQuery
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         initView();
-        my_stunum = getIntent().getExtras().getString(Constant.MY_STUNUM_EXTRA);
+        my_stunum = getIntent().getExtras().getString(Utils.MY_STUNUM_EXTRA);
         mainMessageHandler = new MainMessageHandler(this);
         try {
             messageReceiver.run();
@@ -128,6 +128,7 @@ public class MainActivity extends FragmentActivity implements SearchView.OnQuery
         } catch (Exception e){
             e.printStackTrace();
         }
+        PermissionManager.CheckWritePermission(this);
     }
 
     protected void removeUnderline(){
@@ -250,7 +251,7 @@ public class MainActivity extends FragmentActivity implements SearchView.OnQuery
                 contact_online = true;
                 final String student_number = searchView.getQuery().toString();
                 boolean wrong_number = false;
-                if (student_number.length() != 10 || !student_number.matches(Constant.STU_NUM_REGEX)){
+                if (student_number.length() != 10 || !student_number.matches(Utils.STU_NUM_REGEX)){
                     wrong_number = true;
                 }
 
@@ -271,7 +272,7 @@ public class MainActivity extends FragmentActivity implements SearchView.OnQuery
                     contact_online = false;
                 } else if (reply.equals("Incorrect No.")){
                     wrong_number = true;
-                } else if (reply.matches(Constant.IPV4_REGEX)){
+                } else if (reply.matches(Utils.IPV4_REGEX)){
                     wrong_number = false;
                 } else if (reply.equals("Error")){
                     Toast.makeText(this, R.string.never_signup, Toast.LENGTH_SHORT).show();

@@ -1,11 +1,13 @@
 package com.johnwilliams.qq.tools.Connection;
 
+import android.os.Environment;
 import android.os.Message;
 
 import com.johnwilliams.qq.Activities.ChatActivity;
 import com.johnwilliams.qq.Activities.MainActivity;
-import com.johnwilliams.qq.tools.Constant;
+import com.johnwilliams.qq.tools.Utils;
 import com.johnwilliams.qq.tools.Message.ChatMessage;
+
 import java.net.Socket;
 import java.util.List;
 import java.io.*;
@@ -35,12 +37,15 @@ public class ServerWorkerRunnable implements Runnable{
             int bytesRead;
             ChatMessage chatMessage;
             char[] length_info = new char[3];
-            BufferedReader input = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+            BufferedReader input;
             BufferedWriter output = new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream()));
-
             while(true){
                 result = new StringBuilder();
-                input.read(length_info);// read whole length of message
+                input = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+                int read_result = input.read(length_info);// read whole length of message
+                if (read_result == -1) {
+                    continue;
+                }
                 if (isStopped){
                     break;
                 }
@@ -59,23 +64,67 @@ public class ServerWorkerRunnable implements Runnable{
                         chatMessage.getContent().equals("BYE")){
                     break;
                 }
+
+                if (chatMessage.getType() == ChatMessage.MSG_TYPE.FILE){
+                    String[] splited = chatMessage.getContent().split("\\?");
+                    chatMessage.setContent(splited[0]);
+                    chatMessage.setFile_length(Long.parseLong(splited[1]));
+                }
+
                 results.add(chatMessage);
 
                 // Send message using handler
                 Message msg = new Message();
-                msg.what = Constant.NEW_MESSAGE;
+                msg.what = Utils.NEW_MESSAGE;
                 msg.obj = chatMessage;
                 if (ChatActivity.chatMessageHandler != null) {
                     ChatActivity.chatMessageHandler.sendMessage(msg);
                 }
 
                 msg = new Message();
-                msg.what = Constant.NEW_MESSAGE;
+                msg.what = Utils.NEW_MESSAGE;
                 msg.obj = chatMessage;
                 if (MainActivity.mainMessageHandler != null)
                     MainActivity.mainMessageHandler.sendMessage(msg);
 
-
+                // if is file
+                if (chatMessage.getType() == ChatMessage.MSG_TYPE.FILE){
+                    InputStream inputStream = clientSocket.getInputStream();
+                    File dir = new File(Environment.getExternalStorageDirectory().getPath() + "/johnwilliams/qq/");
+                    if (!dir.exists()){
+                        dir.mkdirs();
+                    }
+                    String savePath = Environment.getExternalStorageDirectory().getPath() + "/johnwilliams/qq/"
+                            + Utils.convertFileName(chatMessage.getContent(), false);
+                    FileOutputStream file = new FileOutputStream(savePath, false);
+                    byte[] buffer = new byte[1024];
+                    int size;
+                    Long received_length = 0L;
+                    while ((size = inputStream.read(buffer)) != -1){
+                        file.write(buffer, 0, size);
+                        received_length += size;
+                        chatMessage.setProgress((int)(received_length * 100.0 / chatMessage.getFile_length()));
+                        msg = new Message();
+                        msg.what = Utils.UPDATE_PROGRESS;
+                        msg.obj = chatMessage;
+                        if (ChatActivity.chatMessageHandler != null){
+                            ChatActivity.chatMessageHandler.sendMessage(msg);
+                        }
+                        if (received_length.equals(chatMessage.getFile_length())){
+                            break;
+                        }
+                    }
+                    file.close();
+                    input.close();
+                    msg = new Message();
+                    msg.what = Utils.UPDATE_PROGRESS;
+                    chatMessage.setProgress(101);// finished
+                    msg.obj = chatMessage;
+                    if (ChatActivity.chatMessageHandler != null){
+                        ChatActivity.chatMessageHandler.sendMessage(msg);
+                    }
+                    break;
+                }
             }
             input.close();
             output.close();

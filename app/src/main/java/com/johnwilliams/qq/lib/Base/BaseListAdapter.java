@@ -42,6 +42,15 @@ public abstract class BaseListAdapter<E> extends BaseAdapter {
         notifyDataSetChanged();
     }
 
+    public E get(int i) {
+        return this.list.get(i);
+    }
+
+    public void set(int i, E e) {
+        this.list.set(i, e);
+        notifyDataSetChanged();
+    }
+
     public void remove(int position) {
         this.list.remove(position);
         notifyDataSetChanged();

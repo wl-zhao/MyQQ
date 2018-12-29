@@ -3,10 +3,9 @@ package com.johnwilliams.qq.tools.Connection;
 import android.os.AsyncTask;
 import android.os.Message;
 import android.util.Log;
-import android.widget.ListView;
 
 import com.johnwilliams.qq.Activities.ChatActivity;
-import com.johnwilliams.qq.tools.Constant;
+import com.johnwilliams.qq.tools.Utils;
 import com.johnwilliams.qq.tools.Message.ChatMessage;
 
 import java.io.IOException;
@@ -17,11 +16,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import cn.bmob.v3.BmobObject;
+
 import cn.bmob.v3.BmobQuery;
 import cn.bmob.v3.datatype.BmobQueryResult;
 import cn.bmob.v3.exception.BmobException;
-import cn.bmob.v3.listener.FindListener;
 import cn.bmob.v3.listener.SQLQueryListener;
 
 public class MessageReceiver implements Runnable{
@@ -65,7 +63,7 @@ public class MessageReceiver implements Runnable{
                     if (list != null && list.size() > 0){
                         chatMessages.addAll(list);
                         Message msg = new Message();
-                        msg.what = Constant.LOAD_DONE;
+                        msg.what = Utils.LOAD_DONE;
                         msg.obj = chatMessages;
                         ChatActivity.chatMessageHandler.sendMessage(msg);
                     }
@@ -103,11 +101,7 @@ public class MessageReceiver implements Runnable{
                         }
                         throw new RuntimeException("Error accepting", e);
                     }
-                    if (serverWorkerRunnable == null){
-                        serverWorkerRunnable = new ServerWorkerRunnable(clientSocket);
-                    } else {
-                        serverWorkerRunnable.initWithSocket(clientSocket);
-                    }
+                    serverWorkerRunnable = new ServerWorkerRunnable(clientSocket);
                     new Thread(
                             serverWorkerRunnable
                     ).start();

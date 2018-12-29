@@ -37,6 +37,10 @@ public class ChatMessage extends BmobObject {
     private String to_stunum = default_num;
     private String content = "";
 
+    private Long file_length = 0L;
+
+    private int progress = 0;
+
     private Long time = 0L;
     private MSG_TYPE type = MSG_TYPE.TEXT;
     private MSG_STATUS status = MSG_STATUS.SENDING;
@@ -137,7 +141,24 @@ public class ChatMessage extends BmobObject {
     public MSG_STATUS getStatus(){
         return status;
     }
+
     public void setStatus(MSG_STATUS status){
         this.status = status;
+    }
+
+    public Long getFile_length() {
+        return file_length;
+    }
+
+    public void setFile_length(Long file_length) {
+        this.file_length = file_length;
+    }
+
+    public int getProgress() {
+        return progress;
+    }
+
+    public void setProgress(int progress) {
+        this.progress = progress;
     }
 }

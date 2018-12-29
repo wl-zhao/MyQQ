@@ -71,7 +71,7 @@ public class ConnectionTool {
                     }
                     socket = new Socket();
                     socket.setSoTimeout(2000);
-                    socket.setReuseAddress(true);//TODO: important!
+//                    socket.setReuseAddress(true);//TODO: important!
 //                    socket.bind(new InetSocketAddress(Integer.parseInt(localPort)));
                     socket.connect(new InetSocketAddress(strings[0], Integer.parseInt(strings[1])));
                     outToServer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
@@ -143,5 +143,14 @@ public class ConnectionTool {
         outToServer.close();
         inFromServer.close();
         System.out.println("Bye");
+    }
+
+    @Override
+    public void finalize(){
+        try {
+            socket.close();
+        } catch (Exception e){
+
+        }
     }
 }

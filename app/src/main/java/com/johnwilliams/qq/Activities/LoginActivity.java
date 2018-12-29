@@ -11,8 +11,7 @@ import android.widget.Toast;
 
 import com.johnwilliams.qq.R;
 import com.johnwilliams.qq.tools.Connection.ConnectionTool;
-import com.johnwilliams.qq.tools.Constant;
-import com.johnwilliams.qq.tools.PermissionManager;
+import com.johnwilliams.qq.tools.Utils;
 
 
 public class LoginActivity extends Activity {
@@ -28,6 +27,12 @@ public class LoginActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         initView();
+        try {
+            if (connectionTool.socket == null || !connectionTool.socket.isConnected())
+                connectionTool.ConnectionInit(ConnectionTool.ServerIP, ConnectionTool.ServerPort, connectionTool.LocalPort);
+        } catch (Exception e) {
+
+        }
     }
 
     private void initView(){
@@ -55,7 +60,7 @@ public class LoginActivity extends Activity {
                 @Override
                 public void run(){
                     try{
-                        Thread.sleep(2000);
+                        Thread.sleep(5000);
                     } catch (InterruptedException e){
                         Thread.currentThread().interrupt();
                     }
@@ -63,10 +68,9 @@ public class LoginActivity extends Activity {
                 }
             };
             sleep.start();
-            do {
-                reply = connectionTool.Login(stunumEditText.getText().toString(),
-                        passwordEditText.getText().toString());
-            } while(reply.equals("") && !LoginActivity.timeout);//2 second login attempt
+            reply = connectionTool.Login(stunumEditText.getText().toString(),
+                    passwordEditText.getText().toString());
+            while(reply.equals("") && !LoginActivity.timeout);//2 second login attempt
             if (reply.equals("Error")){
                 Toast.makeText(this, "服务器连接失败", Toast.LENGTH_SHORT).show();
                 return;
@@ -77,7 +81,7 @@ public class LoginActivity extends Activity {
             {
                 Toast.makeText(this, "验证成功", Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(this, MainActivity.class);
-                intent.putExtra(Constant.MY_STUNUM_EXTRA, stunumEditText.getText().toString());
+                intent.putExtra(Utils.MY_STUNUM_EXTRA, stunumEditText.getText().toString());
                 startActivity(intent);
                 my_stunum = stunumEditText.getText().toString();
             }

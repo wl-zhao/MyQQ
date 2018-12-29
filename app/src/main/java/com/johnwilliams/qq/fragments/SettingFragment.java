@@ -10,8 +10,7 @@ import android.widget.Button;
 
 import com.johnwilliams.qq.Activities.MainActivity;
 import com.johnwilliams.qq.R;
-import com.johnwilliams.qq.tools.Constant;
-import com.johnwilliams.qq.tools.Contact.Contact;
+import com.johnwilliams.qq.tools.Utils;
 
 public class SettingFragment extends MyFragment implements View.OnClickListener {
 
@@ -38,26 +37,26 @@ public class SettingFragment extends MyFragment implements View.OnClickListener 
 
     @Override
     public void onClick(View v) {
-        int message = Constant.DO_NOTHING;
+        int message = Utils.DO_NOTHING;
         switch (v.getId()){
             case R.id.btn_clear_chats:
-                message = Constant.CLEAR_CHAT;
-                MainActivity.mainMessageHandler.sendEmptyMessage(Constant.CLEAR_CHAT);
+                message = Utils.CLEAR_CHAT;
+                MainActivity.mainMessageHandler.sendEmptyMessage(Utils.CLEAR_CHAT);
                 break;
             case R.id.btn_clear_contacts:
-                message = Constant.CLEAR_CONTACT;
-                MainActivity.mainMessageHandler.sendEmptyMessage(Constant.CLEAR_CONTACT);
+                message = Utils.CLEAR_CONTACT;
+                MainActivity.mainMessageHandler.sendEmptyMessage(Utils.CLEAR_CONTACT);
                 break;
         }
 
-        if (message == Constant.DO_NOTHING){
+        if (message == Utils.DO_NOTHING){
             return;
         }
 
         final int sendMessage = message;
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-        builder.setMessage("是否清空?").setTitle("清空" + (sendMessage == Constant.CLEAR_CHAT ? "聊天记录" : "联系人"));
+        builder.setMessage("是否清空?").setTitle("清空" + (sendMessage == Utils.CLEAR_CHAT ? "聊天记录" : "联系人"));
         builder.setPositiveButton(R.string.Ok, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {

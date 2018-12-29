@@ -39,14 +39,13 @@ import com.johnwilliams.qq.lib.Emoj.FaceTextUtils;
 import com.johnwilliams.qq.lib.XListView.XListView;
 import com.johnwilliams.qq.tools.Connection.MessageReceiver;
 import com.johnwilliams.qq.tools.Connection.MessageSender;
-import com.johnwilliams.qq.tools.Constant;
+import com.johnwilliams.qq.tools.Utils;
 import com.johnwilliams.qq.tools.Message.ChatMessage;
 import com.johnwilliams.qq.tools.Message.MessageAdapter;
 import com.johnwilliams.qq.tools.PermissionManager;
 import com.johnwilliams.qq.tools.URIConverter;
 
-import org.w3c.dom.Text;
-
+import java.io.File;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.EventListener;
@@ -99,6 +98,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     // Input EditText
     EmoticonsEditText edit_user_comment;
     final public static MessageSender messageSender = new MessageSender();
+    public MessageSender fileSender;
 
     public static class ChatMessageHandler extends Handler{
         private WeakReference<ChatActivity> mActivity;
@@ -112,12 +112,16 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             super.handleMessage(msg);
             ChatActivity chatActivity = mActivity.get();
             switch (msg.what){
-                case Constant.NEW_MESSAGE:
-                    chatActivity.initOrRefresh();
+                case Utils.NEW_MESSAGE:
+                    chatActivity.mAdapter.add((ChatMessage)msg.obj);
                     Toast.makeText(chatActivity, R.string.new_message, Toast.LENGTH_SHORT);
                     break;
-                case Constant.LOAD_DONE:
+                case Utils.LOAD_DONE:
                     chatActivity.mAdapter.addAll((List<ChatMessage>)msg.obj);
+                    break;
+                case Utils.UPDATE_PROGRESS:
+                    ChatMessage chatMessage = (ChatMessage) msg.obj;
+                    chatActivity.mAdapter.updateMessage(chatMessage);
                     break;
             }
         }
@@ -387,9 +391,9 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
     void initData(){
         chatMessageHandler = new ChatMessageHandler(this);
-        friend_name = getIntent().getExtras().getString(Constant.FRIEND_NAME_EXTRA);
-        friend_stunum = getIntent().getExtras().getString(Constant.FRIEND_STUNUM_EXTRA);
-        my_stunum = getIntent().getExtras().getString(Constant.MY_STUNUM_EXTRA);
+        friend_name = getIntent().getExtras().getString(Utils.FRIEND_NAME_EXTRA);
+        friend_stunum = getIntent().getExtras().getString(Utils.FRIEND_STUNUM_EXTRA);
+        my_stunum = getIntent().getExtras().getString(Utils.MY_STUNUM_EXTRA);
 
         messageSender.DataInit(my_stunum, friend_stunum);
         try {
@@ -425,6 +429,13 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     public void performFileSearch(){
+        try {
+            fileSender = new MessageSender();
+            fileSender.DataInit(my_stunum, friend_stunum);
+            fileSender.ConnectionInit();
+        } catch (Exception e){
+
+        }
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
         intent.addCategory(Intent.CATEGORY_OPENABLE);
         intent.setType("*/*");
@@ -439,11 +450,15 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                 uri = resultData.getData();
                 String localPath = URIConverter.getPathFromUri(this, uri);
                 Toast.makeText(this, localPath, Toast.LENGTH_LONG).show();
+                File file = new File(localPath);
+                Long file_length = file.length();
+                String content = localPath + "?" + file_length.toString();
                 // TODO: send files
-                ChatMessage chatMessage = new ChatMessage(my_stunum, friend_stunum, uri.toString(), new Date().getTime(),
+                ChatMessage chatMessage = new ChatMessage(my_stunum, friend_stunum, content, new Date().getTime(),
                         ChatMessage.MSG_TYPE.FILE, ChatMessage.MSG_STATUS.SENDING);
                 try{
-                    messageSender.SendFile(localPath, chatMessage);
+                    fileSender.SendMessage(chatMessage);
+                    fileSender.SendFile(localPath, chatMessage);
                 } catch (Exception e){
                     e.printStackTrace();
                 }

@@ -2,14 +2,21 @@ package com.johnwilliams.qq.tools.Connection;
 
 import android.icu.util.Output;
 import android.net.Uri;
+import android.os.AsyncTask;
+import android.os.Message;
 import android.util.Log;
 
+import com.johnwilliams.qq.Activities.ChatActivity;
 import com.johnwilliams.qq.Activities.LoginActivity;
 import com.johnwilliams.qq.tools.Message.ChatMessage;
+import com.johnwilliams.qq.tools.Utils;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.util.Arrays;
 
 public class MessageSender extends ConnectionTool {
 
@@ -51,16 +58,45 @@ public class MessageSender extends ConnectionTool {
         return false;
     }
 
-    public boolean SendFile(String localPath, ChatMessage message) throws Exception{
-        FileInputStream fileInput = new FileInputStream(localPath);
-        int size = -1;
-        byte [] buffer = new byte[1024];
-        while ((size = fileInput.read(buffer, 0, 1024)) != -1){
-            //outputData.write(buffer, 0, size);
-        }
-        //outputData.close();
-        fileInput.close();
-        return false;
+    public void SendFile(String localPath, ChatMessage fileMessage) throws Exception{
+        final AsyncTask<String, Void, Void> sendFile = new AsyncTask<String, Void, Void>() {
+            @Override
+            protected Void doInBackground(String... strings) {
+                try{
+                    FileInputStream fileInput = new FileInputStream(strings[0]);
+                    ChatMessage fileMessage = new ChatMessage(strings[1]);
+                    OutputStream outputStream = socket.getOutputStream();
+                    int size;
+                    Long sent_size = 0L;
+                    String[] splitted = fileMessage.getContent().split("\\?");
+                    fileMessage.setContent(splitted[0]);
+                    fileMessage.setFile_length(Long.parseLong(splitted[1]));
+                    byte [] buffer = new byte[1024];
+                    Message msg;
+                    while ((size = fileInput.read(buffer, 0, 1024)) != -1){
+                        outputStream.write(buffer, 0, size);
+                        sent_size += size;
+                        msg = new Message();
+                        msg.what = Utils.UPDATE_PROGRESS;
+                        fileMessage.setProgress((int)(100 * sent_size / fileMessage.getFile_length()));
+                        msg.obj = fileMessage;
+                        ChatActivity.chatMessageHandler.sendMessage(msg);
+                    }
+                    msg = new Message();
+                    msg.what = Utils.UPDATE_PROGRESS;
+                    fileMessage.setProgress(101);// done
+                    msg.obj = fileMessage;
+                    ChatActivity.chatMessageHandler.sendMessage(msg);
+                    outputStream.close();
+                    fileInput.close();
+                }
+                catch (Exception e){
+                    e.printStackTrace();
+                }
+                return null;
+            }
+        };
+        sendFile.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, localPath, fileMessage.toString());
     }
 
     @Override

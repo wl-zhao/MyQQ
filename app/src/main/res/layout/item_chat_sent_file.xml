@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_horizontal"
+    android:orientation="vertical"
+    android:paddingTop="13dp" >
+
+    <TextView
+        android:id="@+id/tv_time"
+        style="@style/chat_text_date_style"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/margin_chat_top" >
+
+        <ImageView
+            android:id="@+id/iv_avatar"
+            android:layout_width="@dimen/base_scrollview_top_height"
+            android:layout_height="@dimen/base_scrollview_top_height"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginRight="@dimen/margin_chat_top"
+            android:background="@drawable/github"
+            android:contentDescription="@string/add_avator"
+            android:scaleType="fitXY" />
+
+        <ImageView
+            android:id="@+id/iv_file"
+            android:layout_width="200dp"
+            android:layout_height="80dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginRight="@dimen/margin_chat_top"
+            android:layout_toLeftOf="@id/iv_avatar"
+            android:background="@drawable/chat_right_qp"
+            android:contentDescription="@string/add_avator"
+            android:maxWidth="200.0dip"
+            android:minWidth="150dp"
+            android:minHeight="150dp"
+            android:paddingLeft="130dp"
+            android:paddingTop="5dp"
+            android:paddingRight="15dp"
+            android:paddingBottom="10dp"
+            android:scaleType="fitXY"
+            app:srcCompat="@drawable/file_color" />
+        <!--<ImageView-->
+            <!--android:id="@+id/iv_picture"-->
+            <!--android:layout_width="100dp"-->
+            <!--android:layout_height="80dp"-->
+            <!--android:layout_marginLeft="@dimen/margin_chat_top"-->
+            <!--android:layout_marginTop="10dp"-->
+            <!--android:layout_toRightOf="@id/iv_avatar"-->
+            <!--android:adjustViewBounds="true"-->
+            <!--android:background="@drawable/chat_left_qp"-->
+            <!--android:contentDescription="@string/add_avator"-->
+            <!--android:paddingLeft="15dp"-->
+            <!--android:paddingTop="5dp"-->
+            <!--android:paddingRight="10dp"-->
+            <!--android:paddingBottom="10dp"-->
+            <!--android:scaleType="fitXY"-->
+            <!--app:srcCompat="@drawable/file_color" />-->
+
+        <ImageView
+            android:id="@+id/iv_fail_resend"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="10dp"
+            android:layout_toLeftOf="@id/iv_file"
+            android:clickable="true"
+            android:contentDescription="@string/action_settings"
+            android:scaleType="fitCenter"
+            android:src="@drawable/btn_chat_fail_resend"
+            android:visibility="invisible" 
+            />
+        <LinearLayout
+            android:layout_width="120dp"
+            android:layout_height="80dp"
+            android:layout_marginTop="10dp"
+            android:layout_alignLeft="@id/iv_file"
+            android:gravity="center_vertical"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tv_file_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_gravity="right"
+                android:text="main.tex" />
+
+            <ProgressBar
+                android:id="@+id/pb_file_loading"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="match_parent"
+                android:layout_marginStart="10dp"
+                android:layout_height="wrap_content"
+                android:max="100"
+                android:progress="50" />
+
+            <TextView
+                android:id="@+id/tv_file_size"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right"
+                android:text="2.3MB" />
+        </LinearLayout>
+    </RelativeLayout>
+
+</LinearLayout>

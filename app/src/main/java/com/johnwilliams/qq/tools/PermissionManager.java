@@ -9,9 +9,16 @@ import android.support.v4.content.ContextCompat;
 
 public class PermissionManager {
     protected static int READ_PERMISSION_REQUEST_CODE = 1;
+    protected static int WRITE_PERMISSION_REQUEST_CODE = 1;
     public static void CheckReadPermission(Context context){
         if (ContextCompat.checkSelfPermission(context, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
             ActivityCompat.requestPermissions((Activity) context, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, READ_PERMISSION_REQUEST_CODE);
+        }
+    }
+
+    public static void CheckWritePermission(Context context){
+        if (ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
+            ActivityCompat.requestPermissions((Activity) context, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, WRITE_PERMISSION_REQUEST_CODE);
         }
     }
 }

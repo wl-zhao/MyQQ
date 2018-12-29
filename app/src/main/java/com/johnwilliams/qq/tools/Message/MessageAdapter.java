@@ -1,6 +1,7 @@
 package com.johnwilliams.qq.tools.Message;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.os.Environment;
 import android.text.SpannableString;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,10 +15,14 @@ import com.johnwilliams.qq.lib.Base.BaseListAdapter;
 import com.johnwilliams.qq.lib.Base.ViewHolder;
 import com.johnwilliams.qq.lib.Emoj.FaceTextUtils;
 import com.johnwilliams.qq.tools.TimeUtil;
+import com.johnwilliams.qq.tools.Utils;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.assist.ImageScaleType;
 import com.nostra13.universalimageloader.core.display.FadeInBitmapDisplayer;
 
+import org.w3c.dom.Text;
+
+import java.io.File;
 import java.util.List;
 
 public class MessageAdapter extends BaseListAdapter<ChatMessage> {
@@ -62,7 +67,9 @@ public class MessageAdapter extends BaseListAdapter<ChatMessage> {
                         mInflater.inflate(R.layout.item_chat_sent_image, null) :
                         mInflater.inflate(R.layout.item_chat_received_image, null);
             case FILE:
-                return null;
+                return MainActivity.my_stunum.equals(msg.getFrom_stunum()) ? //send
+                        mInflater.inflate(R.layout.item_chat_sent_file, null) :
+                        mInflater.inflate(R.layout.item_chat_received_file, null);
             case TEXT:
                 return MainActivity.my_stunum.equals(msg.getFrom_stunum()) ? //send
                         mInflater.inflate(R.layout.item_chat_sent_message, null) :
@@ -97,6 +104,12 @@ public class MessageAdapter extends BaseListAdapter<ChatMessage> {
         // time
         tv_time.setText(TimeUtil.formatTime(message.getTime()));
 
+        // file
+        ImageView iv_file = ViewHolder.get(convertView, R.id.iv_file);
+        TextView tv_file_name = ViewHolder.get(convertView, R.id.tv_file_name);
+        TextView tv_file_size = ViewHolder.get(convertView, R.id.tv_file_size);
+        ProgressBar pb_loading = ViewHolder.get(convertView, R.id.pb_file_loading);
+
         // message
         try {
             switch (message.getStatus()){
@@ -127,6 +140,32 @@ public class MessageAdapter extends BaseListAdapter<ChatMessage> {
                 }
                 break;
             case FILE:
+                tv_file_name.setText(Utils.convertFileName(message.getContent()));
+                tv_file_size.setText(Utils.convertFileSize(message.getFile_length()));
+                if (message.getProgress() == 101){
+                    pb_loading.setVisibility(View.INVISIBLE);
+                } else {
+                    pb_loading.setVisibility(View.VISIBLE);
+                    pb_loading.setProgress(message.getProgress());
+                }
+                iv_file.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        try {
+                            if (MainActivity.my_stunum.equals(message.getFrom_stunum())){// send
+                                File file = new File(message.getContent());
+                                Utils.openFile(mContext, file);
+                            } else { // receive
+                                File file = new File(Environment.getExternalStorageDirectory()
+                                        + mContext.getString(R.string.default_path) +
+                                Utils.convertFileName(message.getContent(), false));
+                                Utils.openFile(mContext, file);
+                            }
+                        } catch (Exception e){
+                            e.printStackTrace();
+                        }
+                    }
+                });
                 break;
             case AUDIO:
                 break;
@@ -136,7 +175,17 @@ public class MessageAdapter extends BaseListAdapter<ChatMessage> {
                 break;
         }
         // TODO: handle other type of input
-
         return convertView;
+    }
+
+    public void updateMessage(ChatMessage message) {
+        for (int i = getCount() - 1; i >= 0; i--) {
+            if (get(i).getTime().equals(message.getTime())){ // same message
+                set(i, message);
+                return;
+            }
+        }
+        // else add to the message list
+        add(message);
     }
 }

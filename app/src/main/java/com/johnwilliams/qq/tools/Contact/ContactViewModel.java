@@ -4,10 +4,6 @@ import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.LiveData;
 
-import com.johnwilliams.qq.Activities.LoginActivity;
-import com.johnwilliams.qq.tools.Connection.ConnectionTool;
-import com.johnwilliams.qq.tools.Constant;
-
 import java.util.List;
 
 public class ContactViewModel extends AndroidViewModel {
@@ -28,7 +24,7 @@ public class ContactViewModel extends AndroidViewModel {
 //        try {
 //            for (Contact contact : mAllContacts.getValue()){
 //                String reply = LoginActivity.connectionTool.getIp(contact.student_number);
-//                contact.online = reply.matches(Constant.IPV4_REGEX);
+//                contact.online = reply.matches(Utils.IPV4_REGEX);
 //                mRepository.update(contact);
 //            }
 //        } catch (Exception e){

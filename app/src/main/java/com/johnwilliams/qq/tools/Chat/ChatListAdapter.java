@@ -17,7 +17,7 @@ import android.widget.Toast;
 import com.johnwilliams.qq.Activities.ChatActivity;
 import com.johnwilliams.qq.Activities.MainActivity;
 import com.johnwilliams.qq.R;
-import com.johnwilliams.qq.tools.Constant;
+import com.johnwilliams.qq.tools.Utils;
 import com.johnwilliams.qq.tools.RecyclerItemClickListener;
 import com.johnwilliams.qq.tools.RecyclerItemLongClickListener;
 import com.johnwilliams.qq.tools.TimeUtil;
@@ -157,6 +157,9 @@ public class ChatListAdapter extends RecyclerView.Adapter<ChatListAdapter.ChatVi
     }
 
     public void filter(String text){
+        if (mChats == null){
+            return;
+        }
         mChats.clear();
         if (text.isEmpty()){
             mChats.addAll(mChatsCopy);
@@ -183,7 +186,7 @@ public class ChatListAdapter extends RecyclerView.Adapter<ChatListAdapter.ChatVi
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 Message msg = new Message();
-                msg.what = Constant.REMOVE_CHAT;
+                msg.what = Utils.REMOVE_CHAT;
                 msg.obj = position;
                 MainActivity.mainMessageHandler.sendMessage(msg);
             }
@@ -203,9 +206,9 @@ public class ChatListAdapter extends RecyclerView.Adapter<ChatListAdapter.ChatVi
         String friend_name = chat.name;
         try {
             Intent intent = new Intent(mContext, ChatActivity.class);
-            intent.putExtra(Constant.FRIEND_STUNUM_EXTRA, friend_stunum);
-            intent.putExtra(Constant.MY_STUNUM_EXTRA, MainActivity.my_stunum);
-            intent.putExtra(Constant.FRIEND_NAME_EXTRA, friend_name);
+            intent.putExtra(Utils.FRIEND_STUNUM_EXTRA, friend_stunum);
+            intent.putExtra(Utils.MY_STUNUM_EXTRA, MainActivity.my_stunum);
+            intent.putExtra(Utils.FRIEND_NAME_EXTRA, friend_name);
             mContext.startActivity(intent);
         } catch (Exception e){
             Toast.makeText(mContext, R.string.connection_error, Toast.LENGTH_SHORT).show();
