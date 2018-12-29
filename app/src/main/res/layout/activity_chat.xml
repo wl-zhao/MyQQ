@@ -22,7 +22,7 @@
             android:layout_height="match_parent"
             android:orientation="vertical"
             android:paddingTop="6dp"
-            android:layout_marginEnd="76dp"
+            android:layout_marginEnd="30dp"
             android:paddingBottom="6dp">
             <TextView
                 android:layout_width="match_parent"

@@ -12,7 +12,7 @@ public class ContactRepository {
 
     ContactRepository(Application application){
         ContactDatabase db = ContactDatabase.getDatabase(application);
-        mContactDao = db.chatDao();
+        mContactDao = db.contactDao();
         mAllContacts = mContactDao.getAll();
     }
 

@@ -22,6 +22,8 @@ import android.text.Spannable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
@@ -155,6 +157,26 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu
+        getMenuInflater().inflate(R.menu.menu_chat, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.create_group:
+                Intent intent = new Intent(this, CreateGroupActivity.class);
+                intent.putExtra(Utils.FRIEND_STUNUM_EXTRA, friend_stunum);
+                intent.putExtra(Utils.MY_STUNUM_EXTRA, my_stunum);
+                startActivity(intent);
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
     protected void onResume(){
         super.onResume();
     }
@@ -177,7 +199,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         title.setText(friend_name.isEmpty() ? friend_stunum : friend_name);
         try{
             friend_ip = LoginActivity.connectionTool.getIp(friend_stunum);
-            if (friend_name.equals("n")){
+            if (friend_ip.equals("n")){
                 online.setText(R.string.offline);
             } else {
                 online.setText(R.string.online);

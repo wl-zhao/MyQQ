@@ -67,7 +67,7 @@ public class ContactListAdapter extends RecyclerView.Adapter<ContactListAdapter.
 
     private final LayoutInflater mInflater;
     private List<Contact> mContacts;
-    private List<Contact> mContactsCopy;
+    public static List<Contact> mContactsCopy;
     private Context mContext;
 
     private RecyclerItemClickListener mClickListener;

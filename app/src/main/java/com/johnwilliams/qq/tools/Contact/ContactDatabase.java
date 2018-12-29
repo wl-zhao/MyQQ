@@ -8,11 +8,9 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 
-import java.util.Date;
-
 @Database(entities = {Contact.class}, version = 1, exportSchema = false)
 public abstract class ContactDatabase extends RoomDatabase {
-    public abstract ContactDao chatDao();
+    public abstract ContactDao contactDao();
 
     private static volatile ContactDatabase INSTANCE;
 
@@ -44,7 +42,7 @@ public abstract class ContactDatabase extends RoomDatabase {
         private final ContactDao mDao;
 
         PopulateDbAsync(ContactDatabase db){
-            mDao = db.chatDao();
+            mDao = db.contactDao();
         }
 
         @Override
