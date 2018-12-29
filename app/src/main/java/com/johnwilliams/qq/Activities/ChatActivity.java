@@ -1,9 +1,13 @@
 package com.johnwilliams.qq.Activities;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.media.MediaPlayer;
+import android.media.MediaRecorder;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.Message;
@@ -17,6 +21,7 @@ import android.text.Selection;
 import android.text.Spannable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
@@ -39,6 +44,7 @@ import com.johnwilliams.qq.lib.Emoj.FaceTextUtils;
 import com.johnwilliams.qq.lib.XListView.XListView;
 import com.johnwilliams.qq.tools.Connection.MessageReceiver;
 import com.johnwilliams.qq.tools.Connection.MessageSender;
+import com.johnwilliams.qq.tools.RecordManager;
 import com.johnwilliams.qq.tools.Utils;
 import com.johnwilliams.qq.tools.Message.ChatMessage;
 import com.johnwilliams.qq.tools.Message.MessageAdapter;
@@ -51,6 +57,8 @@ import java.util.ArrayList;
 import java.util.EventListener;
 import java.util.List;
 import java.util.Date;
+
+import cn.bmob.v3.BmobObject;
 
 public class ChatActivity extends AppCompatActivity implements View.OnClickListener, XListView.IXListViewListener, EventListener {
 
@@ -95,10 +103,14 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     // read file
     private static final int READ_REQUEST_CODE = 42;
 
+    // record
+    private RecordManager recordManager = new RecordManager(this);
+
     // Input EditText
     EmoticonsEditText edit_user_comment;
     final public static MessageSender messageSender = new MessageSender();
     public MessageSender fileSender;
+    public MessageSender audioSender;
 
     public static class ChatMessageHandler extends Handler{
         private WeakReference<ChatActivity> mActivity;
@@ -123,6 +135,11 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                     ChatMessage chatMessage = (ChatMessage) msg.obj;
                     chatActivity.mAdapter.updateMessage(chatMessage);
                     break;
+                case Utils.UPDATE_RECORDING:
+                    int value = (int)msg.obj / 20;
+                    value = (value > 5) ? 5 : value;
+                    chatActivity.setRecordVolume(value);
+                    break;
             }
         }
     }
@@ -134,6 +151,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         initData();
         initView();
         PermissionManager.CheckReadPermission(this);
+        PermissionManager.CheckAudioPermission(this);
     }
 
     @Override
@@ -224,7 +242,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
             }
         });
-
+        initVoiceView();
     }
 
     private void initAddView(){
@@ -247,6 +265,92 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         }
 
         pager_emoj.setAdapter(new EmoViewPagerAdapter(views));
+    }
+
+    // Voice
+    private void initVoiceView() {
+        layout_record = findViewById(R.id.layout_record);
+        tv_voice_tips = findViewById(R.id.tv_voice_tips);
+        iv_record = findViewById(R.id.iv_record);
+        btn_speak.setOnTouchListener(new VoiceTouchListener(this));
+        drawable_Anims = new Drawable[] {
+                getDrawable(R.drawable.chat_icon_voice1),
+                getDrawable(R.drawable.chat_icon_voice2),
+                getDrawable(R.drawable.chat_icon_voice3),
+                getDrawable(R.drawable.chat_icon_voice4),
+                getDrawable(R.drawable.chat_icon_voice5),
+                getDrawable(R.drawable.chat_icon_voice6),
+        };
+    }
+
+    private void setRecordVolume(int value) {
+        iv_record.setImageDrawable(drawable_Anims[value]);
+    }
+    private class VoiceTouchListener implements View.OnTouchListener {
+        Context mContext;
+        public VoiceTouchListener(Context context) {
+            mContext = context;
+        }
+        @Override
+        public boolean onTouch(View v, MotionEvent event) {
+            v.performClick();
+            switch (event.getAction()) {
+                case MotionEvent.ACTION_DOWN:
+                    if (!Utils.checkSdCard()) {
+                        Toast.makeText(mContext, getString(R.string.no_sdcard), Toast.LENGTH_SHORT).show();
+                        return false;
+                    }
+                    try {
+                        v.setPressed(true);
+                        layout_record.setVisibility(View.VISIBLE);
+                        tv_voice_tips.setText(getString(R.string.voice_cancel_tips));
+                        recordManager.startRecording();
+                        audioSender = new MessageSender();
+                        audioSender.DataInit(my_stunum, friend_stunum);
+                        audioSender.ConnectionInit();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    return true;
+                case MotionEvent.ACTION_MOVE:
+                    if (event.getY() < 0) {
+                        tv_voice_tips.setText(getString(R.string.voice_cancel_tips));
+                        tv_voice_tips.setTextColor(Color.RED);
+                    } else {
+                        tv_voice_tips.setText(getString(R.string.voice_up_tips));
+                        tv_voice_tips.setTextColor(Color.WHITE);
+                    }
+                    return true;
+                case MotionEvent.ACTION_UP:
+                    v.setPressed(false);
+                    layout_record.setVisibility(View.INVISIBLE);
+                    try {
+                        if (event.getY() < 0) { //cancel
+                            recordManager.stopRecording(false);
+                        } else {
+                            Integer seconds = recordManager.stopRecording(true);
+                            if (seconds > 1) {
+                                ChatMessage chatMessage = new ChatMessage(my_stunum, friend_stunum, recordManager.getFileName(),
+                                        new Date().getTime(), ChatMessage.MSG_TYPE.AUDIO, ChatMessage.MSG_STATUS.SENDING);
+                                chatMessage.addFileLength();
+                                chatMessage.setContent(chatMessage.getContent() + "?" + seconds.toString());
+                                audioSender.SendMessage(chatMessage);
+                                audioSender.SendFile(recordManager.getFileName(), chatMessage);
+//                                mAdapter.add(chatMessage);
+                            } else {
+                                layout_record.setVisibility(View.GONE);
+                                Toast.makeText(mContext, getString(R.string.too_short), Toast.LENGTH_SHORT).show();
+                                recordManager.deleteFile();
+                            }
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    return true;
+                default:
+                    return false;
+            }
+        }
     }
 
     private View getGridView(final int i){
@@ -368,6 +472,17 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                 Toast.makeText(this, "load file", Toast.LENGTH_LONG).show();
                 performFileSearch();
                 break;
+            case R.id.btn_chat_voice:
+                edit_user_comment.setVisibility(View.GONE);
+                layout_more.setVisibility(View.GONE);
+                btn_chat_voice.setVisibility(View.GONE);
+                btn_chat_keyboard.setVisibility(View.VISIBLE);
+                btn_speak.setVisibility(View.VISIBLE);
+                hideSoftInputView();
+                break;
+            case R.id.btn_chat_keyboard:
+                showEditState(false);
+                break;
         }
     }
 
@@ -408,13 +523,9 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             mAdapter = new MessageAdapter(this, initMsg());
             mListView.setAdapter(mAdapter);
         } else {
-
             MainActivity.messageReceiver.receiveMsg();
             int unread_number = MainActivity.messageReceiver.unread_num;
             if (unread_number != 0){
-//                for (int i = 0; i < unread_number; i++){
-//                    mAdapter.add(MainActivity.messageReceiver.get(i));
-//                }
                 mAdapter.addAll(MainActivity.messageReceiver.readMsg());
                 mListView.setSelection(mAdapter.getCount() - 1);
             } else {
@@ -422,6 +533,32 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             }
         }
     }
+
+    private void showEditState(boolean isEmo) {
+        edit_user_comment.setVisibility(View.VISIBLE);
+        btn_chat_keyboard.setVisibility(View.GONE);
+        btn_chat_voice.setVisibility(View.VISIBLE);
+        btn_speak.setVisibility(View.GONE);
+        edit_user_comment.requestFocus();
+        if (isEmo) {
+            layout_more.setVisibility(View.VISIBLE);
+            layout_more.setVisibility(View.VISIBLE);
+            layout_emoj.setVisibility(View.VISIBLE);
+            layout_add.setVisibility(View.GONE);
+            hideSoftInputView();
+        } else {
+            layout_more.setVisibility(View.GONE);
+            showSoftInputView();
+        }
+    }
+    public void showSoftInputView() {
+        if (getWindow().getAttributes().softInputMode == WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN) {
+            if (getCurrentFocus() != null)
+                ((InputMethodManager) getSystemService(INPUT_METHOD_SERVICE))
+                        .showSoftInput(edit_user_comment, 0);
+        }
+    }
+
 
     List<ChatMessage> initMsg(){
         MessageReceiver.fetchMessages(my_stunum, friend_stunum);
@@ -450,12 +587,10 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                 uri = resultData.getData();
                 String localPath = URIConverter.getPathFromUri(this, uri);
                 Toast.makeText(this, localPath, Toast.LENGTH_LONG).show();
-                File file = new File(localPath);
-                Long file_length = file.length();
-                String content = localPath + "?" + file_length.toString();
                 // TODO: send files
-                ChatMessage chatMessage = new ChatMessage(my_stunum, friend_stunum, content, new Date().getTime(),
+                ChatMessage chatMessage = new ChatMessage(my_stunum, friend_stunum, localPath, new Date().getTime(),
                         ChatMessage.MSG_TYPE.FILE, ChatMessage.MSG_STATUS.SENDING);
+                chatMessage.addFileLength();
                 try{
                     fileSender.SendMessage(chatMessage);
                     fileSender.SendFile(localPath, chatMessage);

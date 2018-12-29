@@ -12,6 +12,7 @@ import com.johnwilliams.qq.BuildConfig;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Locale;
 
 public class Utils {
     public final static String STU_NUM_REGEX = "^[0-9]{10}$";
@@ -19,6 +20,8 @@ public class Utils {
     public final static String MY_STUNUM_EXTRA = "my_stunum";
     public final static String FRIEND_STUNUM_EXTRA = "friend_stunum";
     public final static String FRIEND_NAME_EXTRA = "friend_name";
+    public final static String DEFAULT_PATH = "/johnwilliams/qq/";
+    public final static String AUDIO_SUBDIR = "recording/";
     public final static int NEW_MESSAGE = 0;
     public final static int CLEAR_CHAT = 1;
     public final static int CLEAR_CONTACT = 2;
@@ -28,6 +31,7 @@ public class Utils {
     public final static int UPDATE_CONTACT = 6;
     public final static int LOAD_DONE = 7;
     public final static int UPDATE_PROGRESS = 8;
+    public final static int UPDATE_RECORDING = 9;
     public final static int DO_NOTHING = -1;
 
     // convert file length to file size
@@ -62,6 +66,17 @@ public class Utils {
 
     public static String convertFileName(String file_name){
         return convertFileName(file_name, true);
+    }
+
+    public static String convertAudioLength(Integer seconds) {
+        String time = "";
+        if (seconds >= 60) {
+            Integer minutes = seconds / 60;
+            seconds = seconds % 60;
+            time += seconds.toString() + "\'";
+        }
+        time += String.format(Locale.CHINA, "%2d", seconds) + "\"";
+        return time;
     }
 
     public static void openFile(Context context, File url) throws IOException {
@@ -125,4 +140,13 @@ public class Utils {
         intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
         context.startActivity(intent);
     }
+
+    public static boolean checkSdCard() {
+        if (android.os.Environment.getExternalStorageState().equals(
+                android.os.Environment.MEDIA_MOUNTED))
+            return true;
+        else
+            return false;
+    }
+
 }

@@ -1,10 +1,13 @@
 package com.johnwilliams.qq.tools.Connection;
 
+import android.app.Activity;
+import android.content.res.Resources;
 import android.os.Environment;
 import android.os.Message;
 
 import com.johnwilliams.qq.Activities.ChatActivity;
 import com.johnwilliams.qq.Activities.MainActivity;
+import com.johnwilliams.qq.R;
 import com.johnwilliams.qq.tools.Utils;
 import com.johnwilliams.qq.tools.Message.ChatMessage;
 
@@ -12,6 +15,8 @@ import java.net.Socket;
 import java.util.List;
 import java.io.*;
 import java.util.*;
+
+import androidx.annotation.MainThread;
 
 public class ServerWorkerRunnable implements Runnable{
     protected Socket clientSocket;
@@ -65,10 +70,13 @@ public class ServerWorkerRunnable implements Runnable{
                     break;
                 }
 
-                if (chatMessage.getType() == ChatMessage.MSG_TYPE.FILE){
+                if (chatMessage.isFileType()){
                     String[] splited = chatMessage.getContent().split("\\?");
                     chatMessage.setContent(splited[0]);
                     chatMessage.setFile_length(Long.parseLong(splited[1]));
+                    if (chatMessage.getType() == ChatMessage.MSG_TYPE.AUDIO) {
+                        chatMessage.setAudio_length(Integer.parseInt(splited[2]));
+                    }
                 }
 
                 results.add(chatMessage);
@@ -88,13 +96,18 @@ public class ServerWorkerRunnable implements Runnable{
                     MainActivity.mainMessageHandler.sendMessage(msg);
 
                 // if is file
-                if (chatMessage.getType() == ChatMessage.MSG_TYPE.FILE){
+                if (chatMessage.isFileType()){
                     InputStream inputStream = clientSocket.getInputStream();
-                    File dir = new File(Environment.getExternalStorageDirectory().getPath() + "/johnwilliams/qq/");
+                    String subdir = Utils.DEFAULT_PATH;
+                    if (chatMessage.getType() == ChatMessage.MSG_TYPE.AUDIO) {
+                        subdir += Utils.AUDIO_SUBDIR;
+                    }
+
+                    File dir = new File(Environment.getExternalStorageDirectory().getPath() + subdir);
                     if (!dir.exists()){
                         dir.mkdirs();
                     }
-                    String savePath = Environment.getExternalStorageDirectory().getPath() + "/johnwilliams/qq/"
+                    String savePath = Environment.getExternalStorageDirectory().getPath() + subdir
                             + Utils.convertFileName(chatMessage.getContent(), false);
                     FileOutputStream file = new FileOutputStream(savePath, false);
                     byte[] buffer = new byte[1024];

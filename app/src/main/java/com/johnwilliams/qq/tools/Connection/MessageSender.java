@@ -71,6 +71,9 @@ public class MessageSender extends ConnectionTool {
                     String[] splitted = fileMessage.getContent().split("\\?");
                     fileMessage.setContent(splitted[0]);
                     fileMessage.setFile_length(Long.parseLong(splitted[1]));
+                    if (fileMessage.getType() == ChatMessage.MSG_TYPE.AUDIO) {
+                        fileMessage.setAudio_length(Integer.parseInt(splitted[2]));
+                    }
                     byte [] buffer = new byte[1024];
                     Message msg;
                     while ((size = fileInput.read(buffer, 0, 1024)) != -1){
@@ -85,6 +88,7 @@ public class MessageSender extends ConnectionTool {
                     msg = new Message();
                     msg.what = Utils.UPDATE_PROGRESS;
                     fileMessage.setProgress(101);// done
+                    fileMessage.setStatus(ChatMessage.MSG_STATUS.SENT);
                     msg.obj = fileMessage;
                     ChatActivity.chatMessageHandler.sendMessage(msg);
                     outputStream.close();

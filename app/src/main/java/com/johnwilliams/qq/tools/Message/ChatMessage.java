@@ -1,5 +1,6 @@
 package com.johnwilliams.qq.tools.Message;
 
+import java.io.File;
 import java.util.Locale;
 
 import cn.bmob.v3.BmobObject;
@@ -38,6 +39,10 @@ public class ChatMessage extends BmobObject {
     private String content = "";
 
     private Long file_length = 0L;
+
+
+
+    private int audio_length = 0;
 
     private int progress = 0;
 
@@ -94,6 +99,16 @@ public class ChatMessage extends BmobObject {
         int time_length = Integer.parseInt(s.substring(cursor, cursor += 2));
         time = Long.parseLong(s.substring(cursor, cursor += time_length));
         content = s.substring(cursor, s.length());
+    }
+
+    public void addFileLength() {
+        File file = new File(content);
+        Long file_length = file.length();
+        content = content + "?" + file_length.toString();
+    }
+
+    public boolean isFileType() {
+        return type.getValue() >= 2;
     }
 
     public String getFrom_stunum() {
@@ -160,5 +175,13 @@ public class ChatMessage extends BmobObject {
 
     public void setProgress(int progress) {
         this.progress = progress;
+    }
+
+    public int getAudio_length() {
+        return audio_length;
+    }
+
+    public void setAudio_length(int audio_length) {
+        this.audio_length = audio_length;
     }
 }

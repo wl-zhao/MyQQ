@@ -44,6 +44,10 @@
     <string name="clear_chats">清空聊天记录</string>
     <string name="never_signup">用户未注册</string>
     <string name="default_path">/johnwilliams/qq/</string>
+    <string name="record_path">recording/</string>
+    <string name="no_sdcard">没有SD卡</string>
+    <string name="voice_cancel_tips">松开手指，取消发送</string>
+    <string name="too_short">录音时间过短</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>

@@ -31,7 +31,7 @@ public class LoginActivity extends Activity {
             if (connectionTool.socket == null || !connectionTool.socket.isConnected())
                 connectionTool.ConnectionInit(ConnectionTool.ServerIP, ConnectionTool.ServerPort, connectionTool.LocalPort);
         } catch (Exception e) {
-
+            Toast.makeText(this, "服务器连接失败", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -86,7 +86,7 @@ public class LoginActivity extends Activity {
                 my_stunum = stunumEditText.getText().toString();
             }
             else if (reply.isEmpty()){
-                Toast.makeText(this, "登录过于频繁", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "服务器连接失败", Toast.LENGTH_SHORT).show();
             } else {
                 Toast.makeText(this, "验证失败\n" + reply, Toast.LENGTH_SHORT).show();
             }
