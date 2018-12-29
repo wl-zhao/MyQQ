@@ -471,6 +471,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.tv_file:
                 Toast.makeText(this, "load file", Toast.LENGTH_LONG).show();
                 performFileSearch();
+                layout_add.setVisibility(View.GONE);
                 break;
             case R.id.btn_chat_voice:
                 edit_user_comment.setVisibility(View.GONE);
