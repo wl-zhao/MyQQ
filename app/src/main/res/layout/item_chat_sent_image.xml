@@ -27,59 +27,71 @@
             android:background="@drawable/github"
             android:contentDescription="@string/add_avator"
             android:scaleType="fitXY" />
-
-        <ImageView
-            android:id="@+id/iv_picture"
-            android:layout_width="150dp"
-            android:layout_height="150dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginRight="@dimen/margin_chat_top"
-            android:layout_toLeftOf="@id/iv_avatar"
-            android:background="@drawable/chat_right_qp"
-            android:contentDescription="@string/add_avator"
-            android:scaleType="fitXY"
-            android:maxWidth="200.0dip"
-            android:minHeight="150dp"
-            android:minWidth="150dp"
-            android:paddingLeft="5dp"
-            android:paddingBottom="5dp"
-            android:paddingTop="5dp"
-            android:paddingRight="15dp"
-             />
-
-        <ImageView
-            android:id="@+id/iv_fail_resend"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:layout_centerVertical="true"
-            android:layout_marginRight="10dp"
-            android:layout_toLeftOf="@id/iv_picture"
-            android:clickable="true"
-            android:contentDescription="@string/action_settings"
-            android:scaleType="fitCenter"
-            android:src="@drawable/btn_chat_fail_resend"
-            android:visibility="invisible" 
-            />
-
-        <TextView
-            android:id="@+id/tv_send_status"
-            style="@style/chat_text_name_style"
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_marginRight="10dp"
-            android:layout_toLeftOf="@id/iv_picture"
-            android:textSize="12sp"
-            android:visibility="invisible" />
+            android:orientation="vertical"
+            android:layout_toLeftOf="@id/iv_avatar">
+            <TextView
+                android:id="@+id/tv_sender"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/test_stunum"/>
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
 
-        <ProgressBar
-            android:id="@+id/progress_load"
-            android:layout_width="25dp"
-            android:layout_height="25dp"
-            android:layout_centerVertical="true"
-            android:layout_marginRight="10dp"
-            android:layout_toLeftOf="@id/iv_picture"
-            android:visibility="visible" />
-    </RelativeLayout>
+                <ImageView
+                    android:id="@+id/iv_picture"
+                    android:layout_width="150dp"
+                    android:layout_height="150dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginRight="@dimen/margin_chat_top"
+                    android:contentDescription="@string/add_avator"
+                    android:scaleType="fitXY"
+                    android:maxWidth="200.0dip"
+                    android:minHeight="150dp"
+                    android:minWidth="150dp"
+                    android:paddingLeft="5dp"
+                    android:paddingBottom="5dp"
+                    android:paddingTop="5dp"
+                    android:paddingRight="15dp"
+                    />
 
+                <ImageView
+                    android:id="@+id/iv_fail_resend"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_centerVertical="true"
+                    android:layout_marginRight="10dp"
+                    android:layout_toLeftOf="@id/iv_picture"
+                    android:clickable="true"
+                    android:contentDescription="@string/action_settings"
+                    android:scaleType="fitCenter"
+                    android:src="@drawable/btn_chat_fail_resend"
+                    android:visibility="invisible"
+                    />
+
+                <TextView
+                    android:id="@+id/tv_send_status"
+                    style="@style/chat_text_name_style"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginRight="10dp"
+                    android:layout_toLeftOf="@id/iv_picture"
+                    android:textSize="12sp"
+                    android:visibility="invisible" />
+
+                <ProgressBar
+                    android:id="@+id/pb_loading"
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
+                    android:layout_centerVertical="true"
+                    android:layout_marginRight="10dp"
+                    android:layout_toLeftOf="@id/iv_picture"
+                    android:visibility="visible" />
+            </RelativeLayout>
+        </LinearLayout>
+     </RelativeLayout>
 </LinearLayout>

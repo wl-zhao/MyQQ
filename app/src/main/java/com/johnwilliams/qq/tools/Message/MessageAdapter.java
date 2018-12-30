@@ -1,6 +1,7 @@
 package com.johnwilliams.qq.tools.Message;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.AnimationDrawable;
 import android.media.MediaPlayer;
 import android.os.Environment;
@@ -23,8 +24,6 @@ import com.johnwilliams.qq.tools.Utils;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.assist.ImageScaleType;
 import com.nostra13.universalimageloader.core.display.FadeInBitmapDisplayer;
-
-import org.w3c.dom.Text;
 
 import java.io.File;
 import java.util.List;
@@ -115,7 +114,7 @@ public class MessageAdapter extends BaseListAdapter<ChatMessage> {
         ImageView iv_file = ViewHolder.get(convertView, R.id.iv_file);
         TextView tv_file_name = ViewHolder.get(convertView, R.id.tv_file_name);
         TextView tv_file_size = ViewHolder.get(convertView, R.id.tv_file_size);
-        ProgressBar pb_loading = ViewHolder.get(convertView, R.id.pb_file_loading);
+        ProgressBar pb_loading = ViewHolder.get(convertView, R.id.pb_loading);
 
         //voice
         LinearLayout layout_voice = ViewHolder.get(convertView, R.id.layout_voice);
@@ -174,14 +173,11 @@ public class MessageAdapter extends BaseListAdapter<ChatMessage> {
                                 Utils.openFile(mContext, file);
                             } else { // receive
                                 File file = new File(Environment.getExternalStorageDirectory()
-                                        + mContext.getString(R.string.default_path) +
+                                        + mContext.getString(R.string.default_path) + mContext.getString(R.string.file_path) +
                                 Utils.convertFileName(message.getContent(), false));
                                 Utils.openFile(mContext, file);
                             }
-                            anim = (AnimationDrawable)iv_voice.getDrawable();
-                            anim.start();
                         } catch (Exception e){
-                            anim.stop();
                             e.printStackTrace();
                         }
                     }
@@ -225,9 +221,29 @@ public class MessageAdapter extends BaseListAdapter<ChatMessage> {
                     }
                 });
                 break;
-            case CMD:
-                break;
             case IMG:
+                if (message.getProgress() == 101){
+                    pb_loading.setVisibility(View.INVISIBLE);
+                } else {
+                    pb_loading.setVisibility(View.VISIBLE);
+                }
+                File imgFile = getFile(message);
+                if (imgFile.exists()) {
+                    Bitmap bitmap = Utils.decodeSampledBitmapFromFile(imgFile.getAbsolutePath(), 150, 150);
+                    iv_picture.setImageBitmap(bitmap);
+                }
+                iv_picture.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        try {
+                            Utils.openFile(mContext, getFile(message));
+                        } catch (Exception e){
+                            e.printStackTrace();
+                        }
+                    }
+                });
+                break;
+            case CMD:
                 break;
         }
         // TODO: handle other type of input
@@ -243,5 +259,30 @@ public class MessageAdapter extends BaseListAdapter<ChatMessage> {
         }
         // else add to the message list
         add(message);
+    }
+
+    private File getFile(ChatMessage chatMessage) {
+        if (MainActivity.my_stunum.equals(chatMessage.getFrom_stunum())){// send
+            return new File(chatMessage.getContent());
+        } else { // receive
+            String subdir;
+            switch (chatMessage.getType()) {
+                case AUDIO:
+                    subdir = Utils.AUDIO_SUBDIR;
+                    break;
+                case FILE:
+                    subdir = Utils.FILE_SUBDIR;
+                    break;
+                case IMG:
+                    subdir = Utils.IMAGE_SUBDIR;
+                    break;
+                default:
+                    subdir = "";
+                    break;
+            }
+            return new File(Environment.getExternalStorageDirectory()
+                    + mContext.getString(R.string.default_path) + subdir +
+                    Utils.convertFileName(chatMessage.getContent(), false));
+        }
     }
 }

@@ -99,8 +99,16 @@ public class ServerWorkerRunnable implements Runnable{
                 if (chatMessage.isFileType()){
                     InputStream inputStream = clientSocket.getInputStream();
                     String subdir = Utils.DEFAULT_PATH;
-                    if (chatMessage.getType() == ChatMessage.MSG_TYPE.AUDIO) {
-                        subdir += Utils.AUDIO_SUBDIR;
+                    switch (chatMessage.getType()) {
+                        case AUDIO:
+                            subdir += Utils.AUDIO_SUBDIR;
+                            break;
+                        case IMG:
+                            subdir += Utils.IMAGE_SUBDIR;
+                            break;
+                        case FILE:
+                            subdir += Utils.FILE_SUBDIR;
+                            break;
                     }
 
                     File dir = new File(Environment.getExternalStorageDirectory().getPath() + subdir);

@@ -2,6 +2,8 @@ package com.johnwilliams.qq.tools;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
 import android.support.v4.content.FileProvider;
@@ -26,6 +28,8 @@ public class Utils {
     public final static String FRIEND_NAME_EXTRA = "friend_name";
     public final static String DEFAULT_PATH = "/johnwilliams/qq/";
     public final static String AUDIO_SUBDIR = "recording/";
+    public final static String IMAGE_SUBDIR = "image/";
+    public final static String FILE_SUBDIR = "file/";
     public final static int NEW_MESSAGE = 0;
     public final static int CLEAR_CHAT = 1;
     public final static int CLEAR_CONTACT = 2;
@@ -131,4 +135,40 @@ public class Utils {
         return friend_num.contains(",");
     }
 
+    private static int calculateInSampleSize(
+            BitmapFactory.Options options, int reqWidth, int reqHeight) {
+        // Raw height and width of image
+        final int height = options.outHeight;
+        final int width = options.outWidth;
+        int inSampleSize = 1;
+
+        if (height > reqHeight || width > reqWidth) {
+
+            final int halfHeight = height / 2;
+            final int halfWidth = width / 2;
+
+            // Calculate the largest inSampleSize value that is a power of 2 and keeps both
+            // height and width larger than the requested height and width.
+            while ((halfHeight / inSampleSize) >= reqHeight
+                    && (halfWidth / inSampleSize) >= reqWidth) {
+                inSampleSize *= 2;
+            }
+        }
+        return inSampleSize;
+    }
+
+    public static Bitmap decodeSampledBitmapFromFile(String filePath, int reqWidth, int reqHeight) {
+
+        // First decode with inJustDecodeBounds=true to check dimensions
+        final BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true;
+        BitmapFactory.decodeFile(filePath, options);
+
+        // Calculate inSampleSize
+        options.inSampleSize = calculateInSampleSize(options, reqWidth, reqHeight);
+
+        // Decode bitmap with inSampleSize set
+        options.inJustDecodeBounds = false;
+        return BitmapFactory.decodeFile(filePath, options);
+    }
 }

@@ -49,6 +49,17 @@ public class MessageReceiver implements Runnable{
         return unread_msgs.get(position);
     }
 
+    static public void updateMessages(ChatMessage chatMessage) {
+        String bql = "update ChatMessage set progress = ? where time = ?";
+        BmobQuery<ChatMessage> chatMessageBmobQuery = new BmobQuery<>();
+        chatMessageBmobQuery.doSQLQuery(bql, new SQLQueryListener<ChatMessage>() {
+            @Override
+            public void done(BmobQueryResult<ChatMessage> bmobQueryResult, BmobException e) {
+
+            }
+        }, chatMessage.getProgress(), chatMessage.getTime());
+    }
+
     static public void fetchMessages(String my_stunum, String friend_stunum){
         final List<ChatMessage> chatMessages = new ArrayList<>();
         // fetch from bmob server

@@ -27,32 +27,43 @@
             android:layout_marginLeft="@dimen/margin_chat_top"
             android:background="@drawable/gitlab"
             android:scaleType="fitXY" />
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_toRightOf="@id/iv_avatar">
+            <TextView
+                android:id="@+id/tv_sender"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/test_stunum"
+                android:layout_marginStart="15dp"/>
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+                <ImageView
+                    android:id="@+id/iv_picture"
+                    android:layout_width="150dp"
+                    android:layout_height="150dp"
+                    android:paddingLeft="15dp"
+                    android:paddingBottom="5dp"
+                    android:paddingTop="5dp"
+                    android:paddingRight="5dp"
+                    android:layout_marginLeft="@dimen/margin_chat_top"
+                    android:adjustViewBounds="true"
+                    android:contentDescription="@string/add_avator"
+                    android:scaleType="fitXY" />
 
-        <ImageView
-            android:id="@+id/iv_picture"
-            android:layout_width="150dp"
-            android:layout_height="150dp"
-            android:paddingLeft="15dp"
-            android:paddingBottom="5dp"
-            android:paddingTop="5dp"
-            android:paddingRight="5dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginLeft="@dimen/margin_chat_top"
-            android:layout_toRightOf="@id/iv_avatar"
-            android:adjustViewBounds="true"
-            android:contentDescription="@string/add_avator"
-            android:background="@drawable/chat_left_qp"
-            android:scaleType="fitXY" />
-        
-        <ProgressBar
-            android:id="@+id/progress_load"
-            android:layout_width="25dp"
-            android:layout_height="25dp"
-            android:layout_centerVertical="true"
-            android:layout_marginLeft="10dp"
-            android:layout_toRightOf="@id/iv_picture"
-            android:visibility="visible" />
-        
+                <ProgressBar
+                    android:id="@+id/pb_loading"
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="10dp"
+                    android:layout_toRightOf="@id/iv_picture"
+                    android:visibility="visible" />
+            </RelativeLayout>
+        </LinearLayout>
     </RelativeLayout>
 
 </LinearLayout>

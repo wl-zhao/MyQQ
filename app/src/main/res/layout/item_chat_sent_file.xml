@@ -91,7 +91,7 @@
                         android:text="main.tex" />
 
                     <ProgressBar
-                        android:id="@+id/pb_file_loading"
+                        android:id="@+id/pb_loading"
                         style="?android:attr/progressBarStyleHorizontal"
                         android:layout_width="match_parent"
                         android:layout_marginStart="10dp"

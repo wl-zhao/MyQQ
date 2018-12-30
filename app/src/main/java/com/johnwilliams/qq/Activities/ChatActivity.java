@@ -4,14 +4,15 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
-import android.media.MediaPlayer;
-import android.media.MediaRecorder;
 import android.net.Uri;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.provider.MediaStore;
+import android.support.v4.content.FileProvider;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -21,7 +22,6 @@ import android.text.Selection;
 import android.text.Spannable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -37,6 +37,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.johnwilliams.qq.BuildConfig;
 import com.johnwilliams.qq.R;
 import com.johnwilliams.qq.lib.Emoj.EmoViewPagerAdapter;
 import com.johnwilliams.qq.lib.Emoj.EmoteAdapter;
@@ -55,12 +56,11 @@ import com.johnwilliams.qq.tools.URIConverter;
 
 import java.io.File;
 import java.lang.ref.WeakReference;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.EventListener;
 import java.util.List;
 import java.util.Date;
-
-import cn.bmob.v3.BmobObject;
 
 public class ChatActivity extends AppCompatActivity implements View.OnClickListener, XListView.IXListViewListener, EventListener {
 
@@ -105,6 +105,9 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
     // read file
     private static final int READ_REQUEST_CODE = 42;
+    // camera
+    private static final int REQUEST_IMAGE_CAPTURE = 1;
+    private String localImagePath;
 
     // record
     private RecordManager recordManager = new RecordManager(this);
@@ -151,6 +154,8 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                 case Utils.UPDATE_PROGRESS:
                     chatMessage = (ChatMessage) msg.obj;
                     chatActivity.mAdapter.updateMessage(chatMessage);
+                    if (chatMessage.getProgress() == 101)
+                        MessageReceiver.updateMessages(chatMessage);
                     break;
                 case Utils.UPDATE_RECORDING:
                     int value = (int)msg.obj / 20;
@@ -521,6 +526,10 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                     }
                 }
                 break;
+            case R.id.tv_camera:
+                layout_add.setVisibility(View.GONE);
+                dispatchTakePictureIntent();
+                break;
             case R.id.tv_file:
                 Toast.makeText(this, "load file", Toast.LENGTH_LONG).show();
                 performFileSearch();
@@ -646,26 +655,67 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         startActivityForResult(intent, READ_REQUEST_CODE);
     }
 
+    private void dispatchTakePictureIntent() {
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        File file = createImageFile();
+        localImagePath = file.getPath();
+        Uri photoURI = FileProvider.getUriForFile(this, BuildConfig.APPLICATION_ID + ".provider", file);
+        takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+            startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+        }
+    }
+
+    private File createImageFile() {
+        // Create an image file name
+        refreshFileSender();
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        File dir = new File(Environment.getExternalStorageDirectory() + getString(R.string.default_path) + getString(R.string.image_path));
+        if (!dir.exists()) {
+            dir.mkdirs();
+        }
+        File file = new File(dir, timeStamp + ".jpg");
+        return file;
+    }
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent resultData){
-        if (requestCode == READ_REQUEST_CODE && resultCode == Activity.RESULT_OK){
-            Uri uri = null;
-            if (resultData != null){
-                uri = resultData.getData();
-                String localPath = URIConverter.getPathFromUri(this, uri);
-                Toast.makeText(this, localPath, Toast.LENGTH_LONG).show();
-                // TODO: send files
-                ChatMessage chatMessage = new ChatMessage(my_stunum, friend_stunum, localPath, new Date().getTime(),
-                        ChatMessage.MSG_TYPE.FILE, ChatMessage.MSG_STATUS.SENDING);
-                chatMessage.addFileLength();
-                try{
-                    for (MessageSender fileSender : fileSenders) {
-                        fileSender.SendMessage(chatMessage);
-                        fileSender.SendFile(localPath, chatMessage);
+        if (resultCode == Activity.RESULT_OK) {
+            switch (requestCode) {
+                case READ_REQUEST_CODE:
+                    Uri uri;
+                    if (resultData != null){
+                        uri = resultData.getData();
+                        String localPath = URIConverter.getPathFromUri(this, uri);
+                        Toast.makeText(this, localPath, Toast.LENGTH_LONG).show();
+                        // TODO: send files
+                        ChatMessage chatMessage = new ChatMessage(my_stunum, friend_stunum, localPath, new Date().getTime(),
+                                ChatMessage.MSG_TYPE.FILE, ChatMessage.MSG_STATUS.SENDING);
+                        chatMessage.addFileLength();
+                        try{
+                            for (MessageSender fileSender : fileSenders) {
+                                fileSender.SendMessage(chatMessage);
+                                fileSender.SendFile(localPath, chatMessage);
+                            }
+                        } catch (Exception e){
+                            e.printStackTrace();
+                        }
                     }
-                } catch (Exception e){
-                    e.printStackTrace();
-                }
+                    break;
+                case REQUEST_IMAGE_CAPTURE:
+                    // send image
+                    ChatMessage chatMessage = new ChatMessage(my_stunum, friend_stunum, localImagePath, new Date().getTime(),
+                            ChatMessage.MSG_TYPE.IMG, ChatMessage.MSG_STATUS.SENDING);
+                    chatMessage.addFileLength();
+                    try{
+                        for (MessageSender fileSender : fileSenders) {
+                            fileSender.SendMessage(chatMessage);
+                            fileSender.SendFile(localImagePath, chatMessage);
+                        }
+                    } catch (Exception e){
+                        e.printStackTrace();
+                    }
+                    break;
             }
         }
     }
