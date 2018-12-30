@@ -52,24 +52,44 @@ public class MessageReceiver implements Runnable{
     static public void fetchMessages(String my_stunum, String friend_stunum){
         final List<ChatMessage> chatMessages = new ArrayList<>();
         // fetch from bmob server
-        String bql = "select * from ChatMessage where (from_stunum = ? and to_stunum = ?) " +
-                "or (from_stunum = ? and to_stunum = ?)";
+        String bql = "select * from ChatMessage where (from_stunum = ? and to_stunum = ?) " + // from me, to friend
+                "or (from_stunum = ? and to_stunum = ?)"; // from friend, to me
+        String bql_group = "select * from ChatMessage where to_stunum = ?";// from anyone. to the group
         BmobQuery<ChatMessage> chatMessageBmobQuery = new BmobQuery<>();
-        chatMessageBmobQuery.doSQLQuery(bql, new SQLQueryListener<ChatMessage>() {
-            @Override
-            public void done(BmobQueryResult<ChatMessage> bmobQueryResult, BmobException e) {
-                if (e == null){
-                    List<ChatMessage> list = (List<ChatMessage>) bmobQueryResult.getResults();
-                    if (list != null && list.size() > 0){
-                        chatMessages.addAll(list);
-                        Message msg = new Message();
-                        msg.what = Utils.LOAD_DONE;
-                        msg.obj = chatMessages;
-                        ChatActivity.chatMessageHandler.sendMessage(msg);
+        if (!Utils.isGroupChat(friend_stunum)) {
+            chatMessageBmobQuery.doSQLQuery(bql, new SQLQueryListener<ChatMessage>() {
+                @Override
+                public void done(BmobQueryResult<ChatMessage> bmobQueryResult, BmobException e) {
+                    if (e == null){
+                        List<ChatMessage> list = (List<ChatMessage>) bmobQueryResult.getResults();
+                        if (list != null && list.size() > 0){
+                            chatMessages.addAll(list);
+                            Message msg = new Message();
+                            msg.what = Utils.LOAD_DONE;
+                            msg.obj = chatMessages;
+                            ChatActivity.chatMessageHandler.sendMessage(msg);
+                        }
                     }
                 }
-            }
-        }, my_stunum, friend_stunum, friend_stunum, my_stunum);
+            }, my_stunum, friend_stunum, friend_stunum, my_stunum);
+        } else {
+            chatMessageBmobQuery.doSQLQuery(bql_group, new SQLQueryListener<ChatMessage>() {
+                @Override
+                public void done(BmobQueryResult<ChatMessage> bmobQueryResult, BmobException e) {
+                    if (e == null){
+                        List<ChatMessage> list = (List<ChatMessage>) bmobQueryResult.getResults();
+                        if (list != null && list.size() > 0){
+                            chatMessages.addAll(list);
+                            Message msg = new Message();
+                            msg.what = Utils.LOAD_DONE;
+                            msg.obj = chatMessages;
+                            ChatActivity.chatMessageHandler.sendMessage(msg);
+                        }
+                    }
+                }
+            }, friend_stunum);
+        }
+
         // sort by time
         Comparator<ChatMessage> comparator = new Comparator<ChatMessage>() {
             @Override

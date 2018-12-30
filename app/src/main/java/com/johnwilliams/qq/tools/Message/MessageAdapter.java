@@ -142,14 +142,14 @@ public class MessageAdapter extends BaseListAdapter<ChatMessage> {
         }
 
         final String text = message.getContent();
+        if (Utils.isGroupChat(message.getTo_stunum())) {
+            tv_sender.setVisibility(View.VISIBLE);
+            tv_sender.setText(message.getFrom_stunum());
+        } else {
+            tv_sender.setVisibility(View.GONE);
+        }
         switch (message.getType()){
             case TEXT:
-                if (Utils.isGroupChat(message.getTo_stunum())) {
-                    tv_sender.setVisibility(View.VISIBLE);
-                    tv_sender.setText(message.getFrom_stunum());
-                } else {
-                    tv_sender.setVisibility(View.GONE);
-                }
                 try {
                     SpannableString spannableString = FaceTextUtils.toSpannableString(mContext, text);
                     tv_message.setText(spannableString);

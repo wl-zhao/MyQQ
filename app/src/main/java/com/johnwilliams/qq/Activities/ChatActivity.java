@@ -112,8 +112,8 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     // Input EditText
     EmoticonsEditText edit_user_comment;
     public List<MessageSender> messageSenders = new ArrayList<>();
-    public MessageSender fileSender;
-    public MessageSender audioSender;
+    public List<MessageSender> fileSenders = new ArrayList<>();
+    public List<MessageSender> audioSenders = new ArrayList<>();
 
     public static class ChatMessageHandler extends Handler{
         private WeakReference<ChatActivity> mActivity;
@@ -133,9 +133,16 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                     if (chatMessage.getType() == ChatMessage.MSG_TYPE.CMD) { // ignore command message
                         break;
                     }
-                    if (chatMessage.getTo_stunum().contains(chatActivity.my_stunum)) {
-                        chatActivity.mAdapter.add((ChatMessage)msg.obj);
-                        Toast.makeText(chatActivity, R.string.new_message, Toast.LENGTH_SHORT).show();
+                    if (Utils.isGroupChat(chatMessage.getTo_stunum())) {
+                        if (chatMessage.getTo_stunum().equals(chatActivity.friend_stunum)) {
+                            chatActivity.mAdapter.add((ChatMessage)msg.obj);
+                            Toast.makeText(chatActivity, R.string.new_message, Toast.LENGTH_SHORT).show();
+                        }
+                    } else {
+                        if (chatMessage.getTo_stunum().equals(chatActivity.my_stunum) && chatMessage.getFrom_stunum().equals(chatActivity.friend_stunum)) {
+                            chatActivity.mAdapter.add((ChatMessage)msg.obj);
+                            Toast.makeText(chatActivity, R.string.new_message, Toast.LENGTH_SHORT).show();
+                        }
                     }
                     break;
                 case Utils.LOAD_DONE:
@@ -208,6 +215,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         try{
             friend_ip = LoginActivity.connectionTool.getIp((String)Utils.removeMyStunum(friend_stunum, my_stunum, false));
             if (!Utils.isGroupChat(friend_stunum)) {
+                online.setVisibility(View.VISIBLE);
                 if (friend_ip.equals("n")){
                     online.setText(R.string.offline);
                 } else {
@@ -215,6 +223,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                 }
             } else {
                 online.setText("");
+                online.setVisibility(View.GONE);
             }
         } catch (Exception e){
             Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
@@ -339,9 +348,13 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                         layout_record.setVisibility(View.VISIBLE);
                         tv_voice_tips.setText(getString(R.string.voice_cancel_tips));
                         recordManager.startRecording();
-                        audioSender = new MessageSender();
-                        audioSender.DataInit(my_stunum, friend_stunum);
-                        audioSender.ConnectionInit();
+                        audioSenders.clear();
+                        for (String stu_num : friend_stunums) {
+                            MessageSender audioSender = new MessageSender();
+                            audioSender.DataInit(my_stunum, stu_num);
+                            audioSender.ConnectionInit();
+                            audioSenders.add(audioSender);
+                        }
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -368,9 +381,10 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                                         new Date().getTime(), ChatMessage.MSG_TYPE.AUDIO, ChatMessage.MSG_STATUS.SENDING);
                                 chatMessage.addFileLength();
                                 chatMessage.setContent(chatMessage.getContent() + "?" + seconds.toString());
-                                audioSender.SendMessage(chatMessage);
-                                audioSender.SendFile(recordManager.getFileName(), chatMessage);
-//                                mAdapter.add(chatMessage);
+                                for (MessageSender audioSender : audioSenders) {
+                                    audioSender.SendMessage(chatMessage);
+                                    audioSender.SendFile(recordManager.getFileName(), chatMessage);
+                                }
                             } else {
                                 layout_record.setVisibility(View.GONE);
                                 Toast.makeText(mContext, getString(R.string.too_short), Toast.LENGTH_SHORT).show();
@@ -612,9 +626,13 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
     public void performFileSearch(){
         try {
-            fileSender = new MessageSender();
-            fileSender.DataInit(my_stunum, friend_stunum);
-            fileSender.ConnectionInit();
+            fileSenders.clear();
+            for (String stu_num : friend_stunums) {
+                MessageSender fileSender = new MessageSender();
+                fileSender.DataInit(my_stunum, stu_num);
+                fileSender.ConnectionInit();
+                fileSenders.add(fileSender);
+            }
         } catch (Exception e){
 
         }
@@ -637,8 +655,10 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                         ChatMessage.MSG_TYPE.FILE, ChatMessage.MSG_STATUS.SENDING);
                 chatMessage.addFileLength();
                 try{
-                    fileSender.SendMessage(chatMessage);
-                    fileSender.SendFile(localPath, chatMessage);
+                    for (MessageSender fileSender : fileSenders) {
+                        fileSender.SendMessage(chatMessage);
+                        fileSender.SendFile(localPath, chatMessage);
+                    }
                 } catch (Exception e){
                     e.printStackTrace();
                 }

@@ -63,7 +63,6 @@
                     android:layout_width="120dp"
                     android:layout_height="80dp"
                     android:layout_alignRight="@id/iv_file"
-                    android:layout_marginTop="10dp"
                     android:gravity="center_vertical"
                     android:orientation="vertical">
 
