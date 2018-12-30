@@ -36,8 +36,8 @@ public class ContactViewModel extends AndroidViewModel {
         mRepository.update(contact);
     }
 
-    public void insert(Contact chat){
-        mRepository.insert(chat);
+    public void insert(Contact contact){
+        mRepository.insert(contact);
     }
 
     public void clear(){

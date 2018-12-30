@@ -130,6 +130,9 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             switch (msg.what){
                 case Utils.NEW_MESSAGE:
                     chatMessage = (ChatMessage)msg.obj;
+                    if (chatMessage.getType() == ChatMessage.MSG_TYPE.CMD) { // ignore command message
+                        break;
+                    }
                     if (chatMessage.getTo_stunum().contains(chatActivity.my_stunum)) {
                         chatActivity.mAdapter.add((ChatMessage)msg.obj);
                         Toast.makeText(chatActivity, R.string.new_message, Toast.LENGTH_SHORT).show();

@@ -36,7 +36,6 @@ public class MessageSender extends ConnectionTool {
             throw new Exception("好友不在线");
         }
         ConnectionInit(friend_ip, MessageReceiver.ServerPort, LocalPort);
-
     }
 
     public static void Ping(){

@@ -181,6 +181,15 @@ public class ContactListAdapter extends RecyclerView.Adapter<ContactListAdapter.
         notifyDataSetChanged();
     }
 
+    public boolean contains(String stu_num) {
+        for (Contact contact : mContactsCopy) {
+            if (contact.student_number.equals(stu_num)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private void startChat(int position){
         Contact contact = mContacts.get(position);
         String friend_stunum = contact.student_number;

@@ -70,6 +70,16 @@ public class MainActivity extends FragmentActivity implements SearchView.OnQuery
                 case Utils.NEW_MESSAGE:
                     //TODO
                     ChatMessage chatMessage = (ChatMessage) msg.obj;
+                    if (chatMessage.getType() == ChatMessage.MSG_TYPE.CMD) {
+                        if (chatMessage.getContent().contains("$")) { // new group
+                            String[] group_info = chatMessage.getContent().split("\\$");
+                            group_info[1] = group_info[1].replace(";", ",");
+                            Contact contact = new Contact(group_info[1], group_info[0], false);
+                            ((ContactFragment)mainActivity.mFragments[1]).mContactViewModel.insert(contact);
+                        }
+                        break;
+                    }
+
                     chatMessage.setStatus(ChatMessage.MSG_STATUS.SENT);
                     chatMessage.save(new SaveListener<String>() {
                         @Override
@@ -285,7 +295,7 @@ public class MainActivity extends FragmentActivity implements SearchView.OnQuery
                     Toast.makeText(this, R.string.wrong_stunum, Toast.LENGTH_SHORT).show();
                     break;
                 } else {
-                    if (((ContactFragment)mFragments[1]).mAdapter.getItemCount() != 0){
+                    if (((ContactFragment)mFragments[1]).mAdapter.contains(student_number)){
                         Toast.makeText(this, R.string.contact_exist, Toast.LENGTH_SHORT).show();
                         break;
                     }

@@ -16,11 +16,15 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.johnwilliams.qq.R;
+import com.johnwilliams.qq.tools.Connection.MessageSender;
 import com.johnwilliams.qq.tools.Contact.Contact;
 import com.johnwilliams.qq.tools.Contact.ContactViewModel;
 import com.johnwilliams.qq.tools.CreateGroupAdapter;
+import com.johnwilliams.qq.tools.Message.ChatMessage;
 import com.johnwilliams.qq.tools.Utils;
 
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class CreateGroupActivity extends AppCompatActivity {
@@ -31,6 +35,7 @@ public class CreateGroupActivity extends AppCompatActivity {
     public static Button btn_create_group;
     String my_stunum;
     String friend_stunum;
+    List<MessageSender> messageSenders = new ArrayList<>();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -64,6 +69,17 @@ public class CreateGroupActivity extends AppCompatActivity {
 
     public void submitGroup(View view) {
         final String members = mAdapter.getGroupMember();
+        List<String> member_list = (List<String>)Utils.removeMyStunum(members, my_stunum, true);
+        for (String member : member_list) {
+            try {
+                MessageSender messageSender = new MessageSender();
+                messageSender.DataInit(my_stunum, member);
+                messageSender.ConnectionInit();
+                messageSenders.add(messageSender);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         LayoutInflater inflater = getLayoutInflater();
         final View dialog_view = inflater.inflate(R.layout.dialog_create_group, null);
@@ -77,6 +93,7 @@ public class CreateGroupActivity extends AppCompatActivity {
                     Contact contact = new Contact(members, group_name.getText().toString(), false);
                     mContactViewModel.insert(contact);
                     showToast(R.string.create_group_successfully);
+                    notifyOtherMembers(group_name.getText().toString(), members);
                     finish();
                 }
             }
@@ -92,5 +109,14 @@ public class CreateGroupActivity extends AppCompatActivity {
 
     public void showToast(int resId) {
         Toast.makeText(this, resId, Toast.LENGTH_SHORT).show();
+    }
+
+    public void notifyOtherMembers(String group_name, String members) {
+        members = members.replace(",", ";");
+        for (MessageSender messageSender : messageSenders) {
+            ChatMessage chatMessage = new ChatMessage(my_stunum, messageSender.friend_stunum, group_name + "$" + members,
+                    new Date().getTime(), ChatMessage.MSG_TYPE.CMD, ChatMessage.MSG_STATUS.SENDING);
+            boolean success = messageSender.SendMessage(chatMessage);
+        }
     }
 }

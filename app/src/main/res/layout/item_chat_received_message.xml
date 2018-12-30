@@ -16,7 +16,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/margin_chat_top" >
-
         <ImageView
             android:id="@+id/iv_avatar"
             android:layout_width="@dimen/base_scrollview_top_height"
@@ -28,27 +27,39 @@
             android:background="@drawable/gitlab"
             android:scaleType="fitXY" />
 
-        <TextView
-            android:id="@+id/tv_message"
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:layout_marginLeft="@dimen/margin_chat_top"
-            android:layout_toRightOf="@id/iv_avatar"
-            android:background="@drawable/chat_left_qp"
-            android:clickable="true"
-            android:focusable="true"
-            android:gravity="left|center"
-            android:lineSpacingExtra="2dp"
-            android:maxWidth="225.0dip"
-            android:minWidth="50dp"
-            android:minHeight="50dp"
-            android:paddingLeft="15dp"
-            android:paddingRight="10dp"
-            android:text="@string/test_receive"
-            android:textColor="#ff000000"
-            android:textSize="15sp" />
-
+            android:orientation="vertical"
+            android:layout_toRightOf="@id/iv_avatar">
+            <TextView
+                android:id="@+id/tv_sender"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/test_stunum"
+                android:layout_marginStart="15dp"/>
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+                <TextView
+                    android:id="@+id/tv_message"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="@dimen/margin_chat_top"
+                    android:background="@drawable/chat_left_qp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:gravity="left|center"
+                    android:lineSpacingExtra="2dp"
+                    android:maxWidth="225.0dip"
+                    android:minWidth="50dp"
+                    android:minHeight="50dp"
+                    android:paddingLeft="15dp"
+                    android:paddingRight="10dp"
+                    android:text="@string/test_receive"
+                    android:textColor="#ff000000"
+                    android:textSize="15sp" />
+            </RelativeLayout>
+        </LinearLayout>
     </RelativeLayout>
-
 </LinearLayout>

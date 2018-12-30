@@ -101,6 +101,7 @@ public class MessageAdapter extends BaseListAdapter<ChatMessage> {
         final ImageView iv_fail_resend = ViewHolder.get(convertView, R.id.iv_fail_resend);
 //        final TextView tv_send_status = ViewHolder.get(convertView, R.id.tv_send_status);
         TextView tv_time = ViewHolder.get(convertView, R.id.tv_time);
+        TextView tv_sender = ViewHolder.get(convertView, R.id.tv_sender);
         TextView tv_message = ViewHolder.get(convertView, R.id.tv_message);
 
         final ImageView iv_picture = ViewHolder.get(convertView, R.id.iv_picture);
@@ -143,6 +144,12 @@ public class MessageAdapter extends BaseListAdapter<ChatMessage> {
         final String text = message.getContent();
         switch (message.getType()){
             case TEXT:
+                if (Utils.isGroupChat(message.getTo_stunum())) {
+                    tv_sender.setVisibility(View.VISIBLE);
+                    tv_sender.setText(message.getFrom_stunum());
+                } else {
+                    tv_sender.setVisibility(View.GONE);
+                }
                 try {
                     SpannableString spannableString = FaceTextUtils.toSpannableString(mContext, text);
                     tv_message.setText(spannableString);
