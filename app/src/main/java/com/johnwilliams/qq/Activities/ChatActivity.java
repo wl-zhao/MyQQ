@@ -624,7 +624,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         return new ArrayList<>();
     }
 
-    public void performFileSearch(){
+    private void refreshFileSender() {
         try {
             fileSenders.clear();
             for (String stu_num : friend_stunums) {
@@ -636,6 +636,10 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         } catch (Exception e){
 
         }
+    }
+
+    public void performFileSearch(){
+        refreshFileSender();
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
         intent.addCategory(Intent.CATEGORY_OPENABLE);
         intent.setType("*/*");
