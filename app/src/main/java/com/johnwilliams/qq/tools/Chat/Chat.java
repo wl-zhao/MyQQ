@@ -17,19 +17,19 @@ public class Chat {
 
     @NonNull
     @ColumnInfo(name = "stunum")
-    public String student_number;
+    public String student_number = "";
 
     @ColumnInfo(name = "name")
-    public String name;
+    public String name = "";
 
     @ColumnInfo(name = "time")
-    public long time;
+    public long time = 0L;
 
     @ColumnInfo(name = "unread")
-    public int unread;
+    public int unread = 0;
 
     @ColumnInfo(name = "last_msg")
-    public String last_msg;
+    public String last_msg = "";
 
     @Ignore
     public Chat(){

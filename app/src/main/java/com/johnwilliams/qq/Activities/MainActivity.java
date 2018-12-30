@@ -179,10 +179,12 @@ public class MainActivity extends FragmentActivity implements SearchView.OnQuery
             case R.id.tab_chat_btn:
                 tab_index = 0;
                 top_bar.setVisibility(View.VISIBLE);
+                add_button.setVisibility(View.INVISIBLE);
                 break;
             case R.id.tab_contact_btn:
                 tab_index = 1;
                 top_bar.setVisibility(View.VISIBLE);
+                add_button.setVisibility(View.VISIBLE);
                 break;
             case R.id.tab_set_btn:
                 tab_index = 2;
@@ -282,9 +284,11 @@ public class MainActivity extends FragmentActivity implements SearchView.OnQuery
                 if (wrong_number){
                     Toast.makeText(this, R.string.wrong_stunum, Toast.LENGTH_SHORT).show();
                     break;
-                } else if (((ContactFragment)mFragments[1]).mAdapter.getItemCount() != 0){
-                    Toast.makeText(this, R.string.contact_exist, Toast.LENGTH_SHORT).show();
-                    break;
+                } else {
+                    if (((ContactFragment)mFragments[1]).mAdapter.getItemCount() != 0){
+                        Toast.makeText(this, R.string.contact_exist, Toast.LENGTH_SHORT).show();
+                        break;
+                    }
                 }
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);

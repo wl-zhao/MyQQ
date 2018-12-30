@@ -47,4 +47,13 @@ public class ContactViewModel extends AndroidViewModel {
     public void removeAt(int position){
         mRepository.removeAt(position);
     }
+
+    public boolean contains(String query) {
+        for (Contact contact : mAllContacts.getValue()) {
+            if (contact.student_number.contains(query) || contact.name.contains(query)) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

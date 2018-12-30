@@ -4,6 +4,8 @@ import android.os.AsyncTask;
 import android.os.Handler;
 import android.util.Log;
 
+import com.johnwilliams.qq.tools.Utils;
+
 import java.net.*;
 import java.io.*;
 import java.util.Arrays;
@@ -88,8 +90,25 @@ public class ConnectionTool {
         init.execute(host, port);
     }
 
+    // get Ip of student / students with student_number
     public String getIp(String student_number) throws Exception{
-        return SendCommand("q" + student_number);
+        String[] student_numbers = student_number.split(",");
+        boolean all_offline = true;
+        StringBuilder ips = new StringBuilder();
+        String reply;
+        for (String s : student_numbers) {
+            reply = SendCommand("q" + s);
+            if (reply.matches(Utils.IPV4_REGEX)) {
+                all_offline = false;
+                ips.append(reply);
+                ips.append(",");
+            }
+        }
+        if (all_offline) {
+            return "n";
+        } else {
+            return ips.toString().substring(0, ips.length() - 1);
+        }
     }
 
     public String Login(String student_number, String password) throws Exception{

@@ -1,5 +1,7 @@
 package com.johnwilliams.qq.tools.Message;
 
+import android.arch.persistence.room.util.StringUtil;
+
 import java.io.File;
 import java.util.Locale;
 
@@ -92,9 +94,10 @@ public class ChatMessage extends BmobObject {
 
     public void fromString(String s){
         int cursor = 0;
+        int num_receivers = s.length() - s.replace(",", "").length() + 1;
         int content_length = Integer.parseInt(s.substring(cursor, cursor += 3));
         from_stunum = s.substring(cursor, cursor += STUNUM_LENGTH);//TODO: maybe wrong
-        to_stunum = s.substring(cursor, cursor += STUNUM_LENGTH);
+        to_stunum = s.substring(cursor, cursor += STUNUM_LENGTH * num_receivers + num_receivers - 1);//take commas into account
         type = MSG_TYPE.values()[Integer.parseInt(s.substring(cursor, cursor += 1))];
         int time_length = Integer.parseInt(s.substring(cursor, cursor += 2));
         time = Long.parseLong(s.substring(cursor, cursor += time_length));

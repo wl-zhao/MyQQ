@@ -12,6 +12,10 @@ import com.johnwilliams.qq.BuildConfig;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Locale;
 
 public class Utils {
@@ -89,51 +93,6 @@ public class Utils {
         }
 
         Intent intent = new Intent(Intent.ACTION_VIEW);
-//        // Check what kind of file you are trying to open, by comparing the url with extensions.
-//        // When the if condition is matched, plugin sets the correct intent (mime) type,
-//        // so Android knew what application to use to open the file
-//        if (url.toString().contains(".doc") || url.toString().contains(".docx")) {
-//            // Word document
-//            intent.setDataAndType(uri, "application/msword");
-//        } else if(url.toString().contains(".pdf")) {
-//            // PDF file
-//            intent.setDataAndType(uri, "application/pdf");
-//        } else if(url.toString().contains(".ppt") || url.toString().contains(".pptx")) {
-//            // Powerpoint file
-//            intent.setDataAndType(uri, "application/vnd.ms-powerpoint");
-//        } else if(url.toString().contains(".xls") || url.toString().contains(".xlsx")) {
-//            // Excel file
-//            intent.setDataAndType(uri, "application/vnd.ms-excel");
-//        } else if(url.toString().contains(".zip") || url.toString().contains(".rar")) {
-//            // WAV audio file
-//            intent.setDataAndType(uri, "application/zip");
-//        } else if(url.toString().contains(".rtf")) {
-//            // RTF file
-//            intent.setDataAndType(uri, "application/rtf");
-//        } else if(url.toString().contains(".wav") || url.toString().contains(".mp3")) {
-//            // WAV audio file
-//            intent.setDataAndType(uri, "audio/x-wav");
-//        } else if(url.toString().contains(".gif")) {
-//            // GIF file
-//            intent.setDataAndType(uri, "image/gif");
-//        } else if(url.toString().contains(".jpg") || url.toString().contains(".jpeg") || url.toString().contains(".png")) {
-//            // JPG file
-//            intent.setDataAndType(uri, "image/jpeg");
-//        } else if(url.toString().contains(".txt")) {
-//            // Text file
-//            intent.setDataAndType(uri, "text/plain");
-//        } else if(url.toString().contains(".3gp") || url.toString().contains(".mpg") || url.toString().contains(".mpeg") || url.toString().contains(".mpe") || url.toString().contains(".mp4") || url.toString().contains(".avi")) {
-//            // Video files
-//            intent.setDataAndType(uri, "video/*");
-//        } else {
-//            //if you want you can also define the intent type for any other file
-//
-//            //additionally use else clause below, to manage other unknown extensions
-//            //in this case, Android will show all applications installed on the device
-//            //so you can choose which application to use
-//            intent.setDataAndType(uri, "*/*");
-//        }
-
         String type = MimeTypeMap.getSingleton().getMimeTypeFromExtension(MimeTypeMap.getFileExtensionFromUrl(url.getPath()));
         intent.setDataAndType(uri, type);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -147,6 +106,29 @@ public class Utils {
             return true;
         else
             return false;
+    }
+
+    // remove my_stunum from stu_nums
+    public static Object removeMyStunum(String stu_nums, String my_stunum, boolean return_list) {
+        List<String> stu_num_list = new LinkedList<>(Arrays.asList(stu_nums.split(",")));
+        StringBuilder builder = new StringBuilder();
+        for (int i = 0; i < stu_num_list.size(); i++) {
+            if (stu_num_list.get(i).equals(my_stunum)) {
+                stu_num_list.remove(i);
+                continue;
+            }
+            builder.append(stu_num_list.get(i));
+            builder.append(",");
+        }
+        if (return_list) {
+            return stu_num_list;
+        } else {
+            return builder.toString().substring(0, builder.length() - 1);
+        }
+    }
+
+    public static boolean isGroupChat(String friend_num) {
+        return friend_num.contains(",");
     }
 
 }

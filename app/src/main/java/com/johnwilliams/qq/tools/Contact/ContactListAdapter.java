@@ -104,16 +104,20 @@ public class ContactListAdapter extends RecyclerView.Adapter<ContactListAdapter.
         if (mContacts != null){
             Contact current = mContacts.get(position);
             holder.contact_profile.setImageDrawable(mContext.getResources().getDrawable(R.drawable.github));
-            String online_state = current.online ?
+            String tag = current.online ?
                     mContext.getResources().getString(R.string.online) :
                     mContext.getResources().getString(R.string.offline);
+            if (current.student_number.contains(",")) { // group chat
+                tag = mContext.getString(R.string.tag_groupchat);
+            }
             if (current.name.isEmpty()){
                 holder.contact_name.setText(current.student_number);
-                holder.online_state.setText(online_state);
+                holder.online_state.setText(tag);
             } else {
                 holder.contact_name.setText(current.name);
-                holder.online_state.setText(online_state + current.student_number);
+                holder.online_state.setText(tag + current.student_number);
             }
+
         }
         else{
             holder.ClearView();

@@ -70,8 +70,9 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     // Basic info
     private String friend_name;
     private String friend_stunum;
+    private List<String> friend_stunums;
     private String friend_ip;
-    private String my_stunum;
+    public String my_stunum;
 
     // Ui
     // Buttons
@@ -110,7 +111,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
     // Input EditText
     EmoticonsEditText edit_user_comment;
-    final public static MessageSender messageSender = new MessageSender();
+    public List<MessageSender> messageSenders = new ArrayList<>();
     public MessageSender fileSender;
     public MessageSender audioSender;
 
@@ -125,16 +126,20 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         public void handleMessage(Message msg){
             super.handleMessage(msg);
             ChatActivity chatActivity = mActivity.get();
+            ChatMessage chatMessage;
             switch (msg.what){
                 case Utils.NEW_MESSAGE:
-                    chatActivity.mAdapter.add((ChatMessage)msg.obj);
-                    Toast.makeText(chatActivity, R.string.new_message, Toast.LENGTH_SHORT);
+                    chatMessage = (ChatMessage)msg.obj;
+                    if (chatMessage.getTo_stunum().contains(chatActivity.my_stunum)) {
+                        chatActivity.mAdapter.add((ChatMessage)msg.obj);
+                        Toast.makeText(chatActivity, R.string.new_message, Toast.LENGTH_SHORT).show();
+                    }
                     break;
                 case Utils.LOAD_DONE:
                     chatActivity.mAdapter.addAll((List<ChatMessage>)msg.obj);
                     break;
                 case Utils.UPDATE_PROGRESS:
-                    ChatMessage chatMessage = (ChatMessage) msg.obj;
+                    chatMessage = (ChatMessage) msg.obj;
                     chatActivity.mAdapter.updateMessage(chatMessage);
                     break;
                 case Utils.UPDATE_RECORDING:
@@ -198,11 +203,15 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         TextView online = myToolbar.findViewById(R.id.online);
         title.setText(friend_name.isEmpty() ? friend_stunum : friend_name);
         try{
-            friend_ip = LoginActivity.connectionTool.getIp(friend_stunum);
-            if (friend_ip.equals("n")){
-                online.setText(R.string.offline);
+            friend_ip = LoginActivity.connectionTool.getIp((String)Utils.removeMyStunum(friend_stunum, my_stunum, false));
+            if (!Utils.isGroupChat(friend_stunum)) {
+                if (friend_ip.equals("n")){
+                    online.setText(R.string.offline);
+                } else {
+                    online.setText(R.string.online);
+                }
             } else {
-                online.setText(R.string.online);
+                online.setText("");
             }
         } catch (Exception e){
             Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
@@ -462,7 +471,12 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                         edit_user_comment.getText().toString(),
                         new Date().getTime(), ChatMessage.MSG_TYPE.TEXT,
                         ChatMessage.MSG_STATUS.SENDING);
-                boolean success = messageSender.SendMessage(chatMessage);
+                boolean success = false;
+                for (MessageSender messageSender : messageSenders) {
+                    if (messageSender.SendMessage(chatMessage)) {
+                        success = true;
+                    }
+                }
 
                 if (success){
                     chatMessage.setStatus(ChatMessage.MSG_STATUS.SENT);
@@ -512,7 +526,8 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onDestroy(){
         try {
-            messageSender.ConnectionEnd();
+            for (MessageSender messageSender : messageSenders)
+                messageSender.ConnectionEnd();
         } catch (Exception e){
 
         }
@@ -532,12 +547,16 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         friend_name = getIntent().getExtras().getString(Utils.FRIEND_NAME_EXTRA);
         friend_stunum = getIntent().getExtras().getString(Utils.FRIEND_STUNUM_EXTRA);
         my_stunum = getIntent().getExtras().getString(Utils.MY_STUNUM_EXTRA);
-
-        messageSender.DataInit(my_stunum, friend_stunum);
-        try {
-            messageSender.ConnectionInit();
-        } catch (Exception e){
-            Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
+        friend_stunums = (List<String>) Utils.removeMyStunum(friend_stunum, my_stunum, true);
+        for (String str : friend_stunums) {
+            MessageSender messageSender = new MessageSender();
+            messageSender.DataInit(my_stunum, str);
+            messageSenders.add(messageSender);
+            try {
+                messageSender.ConnectionInit();
+            } catch (Exception e){
+                Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
+            }
         }
     }
 

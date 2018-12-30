@@ -34,23 +34,25 @@
                 android:resource="@xml/provider_paths" />
         </provider>
 
-        <activity android:name=".Activities.SplashActivity">
+        <activity android:name=".Activities.SplashActivity"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".Activities.LoginActivity" />
-        <activity android:name=".Activities.MainActivity" />
-        <activity android:name=".Activities.ChatActivity" />
-
-        <service
-            android:name=".tools.OnClearFromRecentService"
-            android:stopWithTask="false" />
-
-        <activity android:name=".Activities.AddFriendActivity" />
-        <activity android:name=".Activities.CreateGroupActivity"></activity>
+        <activity android:name=".Activities.LoginActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".Activities.MainActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".Activities.ChatActivity"
+            android:screenOrientation="portrait"/>
+        <!--<service-->
+            <!--android:name=".tools.OnClearFromRecentService"-->
+            <!--android:stopWithTask="false" />-->
+        <activity android:name=".Activities.CreateGroupActivity"
+            android:screenOrientation="portrait"/>
     </application>
 
 </manifest>
