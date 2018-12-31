@@ -7,13 +7,16 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.TextView;
 
 import com.johnwilliams.qq.Activities.MainActivity;
 import com.johnwilliams.qq.R;
 import com.johnwilliams.qq.tools.Utils;
 
-public class SettingFragment extends MyFragment implements View.OnClickListener {
+import org.w3c.dom.Text;
 
+public class SettingFragment extends MyFragment implements View.OnClickListener {
+    private TextView tv_name;
     private Button btn_clear_contacts;
     private Button btn_clear_chats;
     @Override
@@ -29,6 +32,8 @@ public class SettingFragment extends MyFragment implements View.OnClickListener 
     }
 
     private void initView(){
+        tv_name = (TextView) findViewById(R.id.contact_name);
+        tv_name.setText(MainActivity.my_stunum);
         btn_clear_chats = (Button) findViewById(R.id.btn_clear_chats);
         btn_clear_contacts = (Button) findViewById(R.id.btn_clear_contacts);
         btn_clear_chats.setOnClickListener(this);

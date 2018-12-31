@@ -21,6 +21,7 @@ import com.johnwilliams.qq.fragments.ContactFragment;
 import com.johnwilliams.qq.fragments.SettingFragment;
 import com.johnwilliams.qq.tools.Chat.Chat;
 import com.johnwilliams.qq.tools.Connection.MessageReceiver;
+import com.johnwilliams.qq.tools.Connection.MessageSender;
 import com.johnwilliams.qq.tools.Message.ChatMessage;
 import com.johnwilliams.qq.tools.Utils;
 import com.johnwilliams.qq.tools.Contact.Contact;
@@ -28,6 +29,7 @@ import com.johnwilliams.qq.tools.PermissionManager;
 
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
+import java.util.Date;
 
 import cn.bmob.v3.Bmob;
 import cn.bmob.v3.exception.BmobException;
@@ -50,6 +52,7 @@ public class MainActivity extends FragmentActivity implements SearchView.OnQuery
     private int cur_tab_index;
     public static String my_stunum;
 
+    private MessageSender messageSender;
     public static MessageReceiver messageReceiver = new MessageReceiver();
     public static MainMessageHandler mainMessageHandler;
     public static boolean contact_online;
@@ -113,9 +116,6 @@ public class MainActivity extends FragmentActivity implements SearchView.OnQuery
                 default:
                     break;
             }
-//            if (msg.what == Utils.NEW_MESSAGE){
-//                // TODO: update database
-//            }
         }
     }
 

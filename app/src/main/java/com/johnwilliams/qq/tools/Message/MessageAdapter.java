@@ -28,6 +28,9 @@ import com.nostra13.universalimageloader.core.display.FadeInBitmapDisplayer;
 import java.io.File;
 import java.util.List;
 
+import pl.droidsonroids.gif.GifDrawable;
+import pl.droidsonroids.gif.GifImageView;
+
 public class MessageAdapter extends BaseListAdapter<ChatMessage> {
 
     DisplayImageOptions options;
@@ -54,13 +57,13 @@ public class MessageAdapter extends BaseListAdapter<ChatMessage> {
     @Override
     public int getItemViewType(int position){
         ChatMessage msg = list.get(position);
-        int offset = MainActivity.my_stunum.equals(msg.getFrom_stunum()) ? 5 : 0;
+        int offset = MainActivity.my_stunum.equals(msg.getFrom_stunum()) ? 6 : 0;
         return msg.getType().getValue() + offset;
     }
 
     @Override
     public int getViewTypeCount(){
-        return 10;
+        return 12;
     }
 
     private View createViewByType(ChatMessage msg, int position){
@@ -68,6 +71,7 @@ public class MessageAdapter extends BaseListAdapter<ChatMessage> {
         switch (type){
             case CMD:
                 return null;
+            case EMO:
             case IMG:
                 return MainActivity.my_stunum.equals(msg.getFrom_stunum()) ? //send
                         mInflater.inflate(R.layout.item_chat_sent_image, null) :
@@ -103,7 +107,7 @@ public class MessageAdapter extends BaseListAdapter<ChatMessage> {
         TextView tv_sender = ViewHolder.get(convertView, R.id.tv_sender);
         TextView tv_message = ViewHolder.get(convertView, R.id.tv_message);
 
-        final ImageView iv_picture = ViewHolder.get(convertView, R.id.iv_picture);
+        final GifImageView iv_picture = ViewHolder.get(convertView, R.id.iv_picture);
         final ProgressBar progress_load = ViewHolder.get(convertView, R.id.progress_load);
         final TextView tv_location = ViewHolder.get(convertView, R.id.tv_location);
         final ImageView iv_voice = ViewHolder.get(convertView, R.id.iv_voice);
@@ -242,6 +246,17 @@ public class MessageAdapter extends BaseListAdapter<ChatMessage> {
                         }
                     }
                 });
+                break;
+            case EMO:
+                pb_loading.setVisibility(View.INVISIBLE);
+                try {
+                    GifDrawable drawable = new GifDrawable(mContext.getResources(),
+                            mContext.getResources().getIdentifier(message.getContent().substring(1),
+                                    "drawable", mContext.getPackageName()));
+                    iv_picture.setImageDrawable(drawable);
+                } catch (Exception e) {
+
+                }
                 break;
             case CMD:
                 break;

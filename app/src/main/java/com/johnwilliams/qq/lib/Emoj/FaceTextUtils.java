@@ -59,6 +59,14 @@ public class FaceTextUtils {
         faceTexts.add(new FaceText("\\mt006"));
         faceTexts.add(new FaceText("\\mt007"));
         faceTexts.add(new FaceText("\\mt008"));
+        faceTexts.add(new FaceText("\\mt015"));
+        faceTexts.add(new FaceText("\\mt018"));
+        faceTexts.add(new FaceText("\\mt039"));
+        faceTexts.add(new FaceText("\\mt043"));
+        faceTexts.add(new FaceText("\\mt054"));
+        faceTexts.add(new FaceText("\\mt064"));
+        faceTexts.add(new FaceText("\\mt082"));
+        faceTexts.add(new FaceText("\\mt086"));
     }
 
     public static String parse(String s) {

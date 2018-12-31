@@ -429,6 +429,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                 if (key.contains("mt")) { // gif
                     ChatMessage chatMessage = new ChatMessage(my_stunum, friend_stunum, key,
                             new Date().getTime(), ChatMessage.MSG_TYPE.EMO, ChatMessage.MSG_STATUS.SENDING);
+                    mAdapter.add(chatMessage);
                     for (MessageSender messageSender : messageSenders) {
                         messageSender.SendMessage(chatMessage);
                     }
