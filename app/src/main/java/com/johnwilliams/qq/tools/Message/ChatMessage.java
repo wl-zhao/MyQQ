@@ -10,7 +10,7 @@ import cn.bmob.v3.BmobObject;
 public class ChatMessage extends BmobObject {
 
     public enum MSG_TYPE{
-        CMD(0), TEXT(1), IMG(2), FILE(3), AUDIO(4);
+        CMD(0), TEXT(1), EMO(2), IMG(3), FILE(4), AUDIO(5);
         private final int value;
         MSG_TYPE(int value){
             this.value = value;
@@ -111,7 +111,7 @@ public class ChatMessage extends BmobObject {
     }
 
     public boolean isFileType() {
-        return type.getValue() >= 2;
+        return type.getValue() >= 3;
     }
 
     public String getFrom_stunum() {

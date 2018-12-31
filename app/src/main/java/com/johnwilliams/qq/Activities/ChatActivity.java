@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
-import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -88,7 +87,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
     // layout
     private LinearLayout layout_more;
-    private LinearLayout layout_emoj;
+    private LinearLayout layout_emo;
     private LinearLayout layout_add;
     private RelativeLayout layout_record;
 
@@ -124,6 +123,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         public ChatMessageHandler(ChatActivity activity){
             mActivity = new WeakReference<>(activity);
         }
+        static boolean progress_updated = false;
 
         @Override
         public void handleMessage(Message msg){
@@ -154,8 +154,12 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                 case Utils.UPDATE_PROGRESS:
                     chatMessage = (ChatMessage) msg.obj;
                     chatActivity.mAdapter.updateMessage(chatMessage);
-                    if (chatMessage.getProgress() == 101)
+                    if (chatMessage.getProgress() == 200 && !progress_updated) {
                         MessageReceiver.updateMessages(chatMessage);
+                        progress_updated = true;
+                    } else if (chatMessage.getProgress() != 200) {
+                        progress_updated = false;
+                    }
                     break;
                 case Utils.UPDATE_RECORDING:
                     int value = (int)msg.obj / 20;
@@ -255,7 +259,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         btn_chat_send.setOnClickListener(this);
 
         layout_more = findViewById(R.id.layout_more);
-        layout_emoj = findViewById(R.id.layout_emo);
+        layout_emo = findViewById(R.id.layout_emo);
         layout_add = findViewById(R.id.layout_add);
         initAddView();
         initEmojView();
@@ -311,7 +315,6 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         for (int i = 0; i < 2; ++i){
             views.add(getGridView(i));
         }
-
         pager_emoj.setAdapter(new EmoViewPagerAdapter(views));
     }
 
@@ -411,9 +414,10 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         GridView gridView = view.findViewById(R.id.gridview);
         List<FaceText> list = new ArrayList<>();
         if (i == 0){
-            list.addAll(emojs.subList(0, 21));
+            list.addAll(emojs.subList(0, 28));
         } else {
-            list.addAll(emojs.subList(21, emojs.size()));
+            gridView.setNumColumns(4);
+            list.addAll(emojs.subList(28, emojs.size()));
         }
         final EmoteAdapter gridAdapter = new EmoteAdapter(ChatActivity.this, list);
         gridView.setAdapter(gridAdapter);
@@ -422,6 +426,14 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 FaceText name = (FaceText) gridAdapter.getItem(position);
                 String key = name.text.toString();
+                if (key.contains("mt")) { // gif
+                    ChatMessage chatMessage = new ChatMessage(my_stunum, friend_stunum, key,
+                            new Date().getTime(), ChatMessage.MSG_TYPE.EMO, ChatMessage.MSG_STATUS.SENDING);
+                    for (MessageSender messageSender : messageSenders) {
+                        messageSender.SendMessage(chatMessage);
+                    }
+                    return;
+                }
                 try{
                     if (edit_user_comment != null && !TextUtils.isEmpty(key)){
                         int start = edit_user_comment.getSelectionStart();
@@ -515,11 +527,11 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                 if (layout_more.getVisibility() == View.GONE){
                     layout_more.setVisibility(View.VISIBLE);
                     layout_add.setVisibility(View.VISIBLE);
-                    layout_emoj.setVisibility(View.GONE);
+                    layout_emo.setVisibility(View.GONE);
 
                 } else {
-                    if (layout_emoj.getVisibility() == View.VISIBLE){
-                        layout_emoj.setVisibility(View.GONE);
+                    if (layout_emo.getVisibility() == View.VISIBLE){
+                        layout_emo.setVisibility(View.GONE);
                         layout_add.setVisibility(View.VISIBLE);
                     } else {
                         layout_more.setVisibility(View.GONE);
@@ -533,7 +545,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.tv_file:
                 Toast.makeText(this, "load file", Toast.LENGTH_LONG).show();
                 performFileSearch();
-                layout_add.setVisibility(View.GONE);
+                layout_more.setVisibility(View.GONE);
                 break;
             case R.id.btn_chat_voice:
                 edit_user_comment.setVisibility(View.GONE);
@@ -545,6 +557,26 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             case R.id.btn_chat_keyboard:
                 showEditState(false);
+                break;
+            case R.id.edit_user_comment:
+                mListView.setSelection(mListView.getCount() - 1);
+                if (layout_more.getVisibility() == View.VISIBLE) {
+                    layout_add.setVisibility(View.GONE);
+                    layout_emo.setVisibility(View.GONE);
+                    layout_more.setVisibility(View.GONE);
+                }
+                break;
+            case R.id.btn_chat_emo:
+                if (layout_more.getVisibility() == View.GONE) {
+                    showEditState(true);
+                } else {
+                    if (layout_add.getVisibility() == View.VISIBLE) {
+                        layout_add.setVisibility(View.GONE);
+                        layout_emo.setVisibility(View.VISIBLE);
+                    } else {
+                        layout_more.setVisibility(View.GONE);
+                    }
+                }
                 break;
         }
     }
@@ -611,7 +643,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         if (isEmo) {
             layout_more.setVisibility(View.VISIBLE);
             layout_more.setVisibility(View.VISIBLE);
-            layout_emoj.setVisibility(View.VISIBLE);
+            layout_emo.setVisibility(View.VISIBLE);
             layout_add.setVisibility(View.GONE);
             hideSoftInputView();
         } else {

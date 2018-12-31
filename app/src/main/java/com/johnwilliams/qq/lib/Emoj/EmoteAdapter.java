@@ -11,6 +11,9 @@ import com.johnwilliams.qq.lib.Base.BaseArrayListAdapter;
 
 import java.util.List;
 
+import pl.droidsonroids.gif.GifDrawable;
+import pl.droidsonroids.gif.GifImageView;
+
 public class EmoteAdapter extends BaseArrayListAdapter {
 
     public EmoteAdapter(Context context, List<FaceText> datas) {
@@ -22,7 +25,7 @@ public class EmoteAdapter extends BaseArrayListAdapter {
         if (convertView == null) {
             convertView = mInflater.inflate(R.layout.item_face_text, null);
             holder = new ViewHolder();
-            holder.mIvImage = (ImageView) convertView
+            holder.mIvImage = convertView
                     .findViewById(R.id.v_face_text);
             convertView.setTag(holder);
         } else {
@@ -30,12 +33,21 @@ public class EmoteAdapter extends BaseArrayListAdapter {
         }
         FaceText faceText = (FaceText) getItem(position);
         String key = faceText.text.substring(1);
-        Drawable drawable =mContext.getResources().getDrawable(mContext.getResources().getIdentifier(key, "drawable", mContext.getPackageName()));
-        holder.mIvImage.setImageDrawable(drawable);
+        if (key.startsWith("mc")) {
+            try {
+                GifDrawable drawable = new GifDrawable(mContext.getResources(), mContext.getResources().getIdentifier(key, "drawable", mContext.getPackageName()));
+                holder.mIvImage.setImageDrawable(drawable);
+            } catch (Exception e) {
+
+            }
+        } else {
+            Drawable drawable = mContext.getResources().getDrawable(mContext.getResources().getIdentifier(key, "drawable", mContext.getPackageName()));
+            holder.mIvImage.setImageDrawable(drawable);
+        }
         return convertView;
     }
 
     class ViewHolder {
-        ImageView mIvImage;
+        GifImageView mIvImage;
     }
 }

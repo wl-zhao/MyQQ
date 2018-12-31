@@ -21,6 +21,7 @@ import cn.bmob.v3.BmobQuery;
 import cn.bmob.v3.datatype.BmobQueryResult;
 import cn.bmob.v3.exception.BmobException;
 import cn.bmob.v3.listener.SQLQueryListener;
+import cn.bmob.v3.listener.UpdateListener;
 
 public class MessageReceiver implements Runnable{
     public List<ChatMessage> unread_msgs;
@@ -49,15 +50,30 @@ public class MessageReceiver implements Runnable{
         return unread_msgs.get(position);
     }
 
-    static public void updateMessages(ChatMessage chatMessage) {
-        String bql = "update ChatMessage set progress = ? where time = ?";
+    static public void updateMessages(final ChatMessage chatMessage) {
+        String bql = "select * from ChatMessage where time = ?";
         BmobQuery<ChatMessage> chatMessageBmobQuery = new BmobQuery<>();
         chatMessageBmobQuery.doSQLQuery(bql, new SQLQueryListener<ChatMessage>() {
             @Override
             public void done(BmobQueryResult<ChatMessage> bmobQueryResult, BmobException e) {
-
+                List<ChatMessage> results = bmobQueryResult.getResults();
+                if (!results.isEmpty()) {
+                    ChatMessage result = results.get(0);
+                    result.setProgress(chatMessage.getProgress());
+                    result.update(result.getObjectId(), new UpdateListener() {
+                        @Override
+                        public void done(BmobException e) {
+                            if (e != null) {
+                                e.printStackTrace();
+                            }
+                        }
+                    });
+                }
+                if (e != null) {
+                    e.printStackTrace();
+                }
             }
-        }, chatMessage.getProgress(), chatMessage.getTime());
+        }, chatMessage.getTime());
     }
 
     static public void fetchMessages(String my_stunum, String friend_stunum){

@@ -45,12 +45,20 @@ public class FaceTextUtils {
         faceTexts.add(new FaceText("\\ue413"));
         faceTexts.add(new FaceText("\\ue414"));
         faceTexts.add(new FaceText("\\ue415"));
-        faceTexts.add(new FaceText("\\ue416"));
-        faceTexts.add(new FaceText("\\ue417"));
-        faceTexts.add(new FaceText("\\ue418"));
-        faceTexts.add(new FaceText("\\ue41f"));
-        faceTexts.add(new FaceText("\\ue00e"));
-        faceTexts.add(new FaceText("\\ue421"));
+//        faceTexts.add(new FaceText("\\ue416"));
+//        faceTexts.add(new FaceText("\\ue418"));
+//        faceTexts.add(new FaceText("\\ue41f"));
+//        faceTexts.add(new FaceText("\\ue00e"));
+//        faceTexts.add(new FaceText("\\ue421"));
+
+        faceTexts.add(new FaceText("\\mt001"));
+        faceTexts.add(new FaceText("\\mt002"));
+        faceTexts.add(new FaceText("\\mt003"));
+        faceTexts.add(new FaceText("\\mt004"));
+        faceTexts.add(new FaceText("\\mt005"));
+        faceTexts.add(new FaceText("\\mt006"));
+        faceTexts.add(new FaceText("\\mt007"));
+        faceTexts.add(new FaceText("\\mt008"));
     }
 
     public static String parse(String s) {

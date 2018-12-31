@@ -158,7 +158,7 @@ public class MessageAdapter extends BaseListAdapter<ChatMessage> {
             case FILE:
                 tv_file_name.setText(Utils.convertFileName(message.getContent()));
                 tv_file_size.setText(Utils.convertFileSize(message.getFile_length()));
-                if (message.getProgress() == 101){
+                if (message.getProgress() == 200){
                     pb_loading.setVisibility(View.INVISIBLE);
                 } else {
                     pb_loading.setVisibility(View.VISIBLE);
@@ -222,7 +222,7 @@ public class MessageAdapter extends BaseListAdapter<ChatMessage> {
                 });
                 break;
             case IMG:
-                if (message.getProgress() == 101){
+                if (message.getProgress() == 200){
                     pb_loading.setVisibility(View.INVISIBLE);
                 } else {
                     pb_loading.setVisibility(View.VISIBLE);

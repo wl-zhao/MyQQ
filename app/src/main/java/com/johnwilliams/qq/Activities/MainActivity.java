@@ -134,7 +134,7 @@ public class MainActivity extends FragmentActivity implements SearchView.OnQuery
             Log.d("ConnectionError", e.getMessage());
         }
         try{
-            Bmob.initialize(this, "835e4319500866049b722e7565cdc450");
+            Bmob.initialize(this, "751d98acd900767bcc27c7a9a4cd6685");
         } catch (Exception e){
             e.printStackTrace();
         }

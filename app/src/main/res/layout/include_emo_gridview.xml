@@ -14,7 +14,7 @@
         android:fadingEdge="none"
         android:gravity="center"
         android:numColumns="7"
-        android:scrollbars="none"
+        android:scrollbars="vertical"
         android:horizontalSpacing="5dp"
         android:verticalSpacing="5dp" />
 

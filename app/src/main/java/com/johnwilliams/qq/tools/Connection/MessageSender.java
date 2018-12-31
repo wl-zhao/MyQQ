@@ -86,7 +86,7 @@ public class MessageSender extends ConnectionTool {
                     }
                     msg = new Message();
                     msg.what = Utils.UPDATE_PROGRESS;
-                    fileMessage.setProgress(101);// done
+                    fileMessage.setProgress(200);// done
                     fileMessage.setStatus(ChatMessage.MSG_STATUS.SENT);
                     msg.obj = fileMessage;
                     ChatActivity.chatMessageHandler.sendMessage(msg);

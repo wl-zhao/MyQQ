@@ -3,11 +3,13 @@
     android:layout_height="wrap_content"
     android:padding="3dp" >
 
-    <ImageView
+    <pl.droidsonroids.gif.GifImageView
         android:id="@+id/v_face_text"
-        android:layout_centerInParent="true"
         android:layout_width="wrap_content"
-                    android:contentDescription="@string/add_avator"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:adjustViewBounds="true"
+        android:layout_centerInParent="true"
+        android:contentDescription="@string/add_avator"
+        android:scaleType="fitCenter" />
 
 </RelativeLayout>

@@ -139,7 +139,7 @@ public class ServerWorkerRunnable implements Runnable{
                     input.close();
                     msg = new Message();
                     msg.what = Utils.UPDATE_PROGRESS;
-                    chatMessage.setProgress(101);// finished
+                    chatMessage.setProgress(200);// finished
                     msg.obj = chatMessage;
                     if (ChatActivity.chatMessageHandler != null){
                         ChatActivity.chatMessageHandler.sendMessage(msg);

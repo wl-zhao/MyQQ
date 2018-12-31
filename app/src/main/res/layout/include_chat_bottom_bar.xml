@@ -105,7 +105,7 @@
         <LinearLayout
             android:id="@+id/layout_emo"
             android:layout_width="match_parent"
-            android:layout_height="120dp"
+            android:layout_height="150dp"
             android:orientation="vertical"
             android:visibility="gone" >
 
