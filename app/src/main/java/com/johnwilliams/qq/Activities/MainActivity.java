@@ -307,6 +307,7 @@ public class MainActivity extends FragmentActivity implements SearchView.OnQuery
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         ((ContactFragment)mFragments[1]).mContactViewModel.insert(new Contact(student_number, "", MainActivity.contact_online));
+                        searchView.setQuery("", false);
                     }
                 });
                 builder.setNegativeButton(R.string.Cancel, new DialogInterface.OnClickListener() {

@@ -19,6 +19,7 @@ public class ConnectionTool {
     public static String ServerPort = "8000";
     public String LocalPort = "50000";
     public Socket socket = null;
+    public String mIp, mPort;
     protected  BufferedReader inFromServer = null;
     protected BufferedWriter outToServer = null;
     protected char[] cbuf = new char[50];
@@ -64,6 +65,8 @@ public class ConnectionTool {
 
     public void ConnectionInit(String host, String port, final String localPort) throws Exception{
 //        init.execute(host, port);
+        mIp = host;
+        mPort = port;
         AsyncTask<String, Void, Void> init = new AsyncTask<String, Void, Void>() {
             @Override
             protected Void doInBackground(String... strings) {
@@ -86,8 +89,8 @@ public class ConnectionTool {
                 return null;
             }
         };
-//        init.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, host, port);
-        init.execute(host, port);
+        init.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, host, port);
+//        init.execute(host, port);
     }
 
     // get Ip of student / students with student_number
@@ -132,12 +135,24 @@ public class ConnectionTool {
                         inFromServer = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                     }
                     Arrays.fill(cbuf, '\0');
+                    if (outToServer == null) {
+                        outToServer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
+                    }
                     outToServer.write(strings[0]);
                     outToServer.flush();
                     inFromServer.read(cbuf);
                 }
                 catch (Exception e){
                     Log.v("Error", e.getMessage());
+                    if (e.getMessage().contains("EBADF")) {
+                        try {
+                            socket = null;
+                            ConnectionInit(mIp, mPort, "");
+//                            doInBackground(strings);
+                        } catch (Exception ee) {
+                            ee.printStackTrace();
+                        }
+                    }
                     return "Error";
 //                    inFromServer.close();
 //                    inFromServer = null;

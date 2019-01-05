@@ -56,7 +56,6 @@
                     android:iconifiedByDefault="false"
                     android:isScrollContainer="false"
                     android:padding="0dp"
-                    android:queryHint="@string/search"
                     android:theme="@style/SearchViewTheme">
 
                 </SearchView>
@@ -131,17 +130,17 @@
 
             <Button
                 android:id="@+id/tab_set_btn"
+                style="?android:attr/borderlessButtonStyle"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:background="@android:color/white"
                 android:drawableTop="@drawable/tab_set_btn"
+                android:onClick="onTabSelect"
                 android:paddingTop="7dip"
                 android:paddingBottom="2dip"
                 android:text="@string/tab_set"
-                android:onClick="onTabSelect"
                 android:textColor="@drawable/tab_textcolor"
                 android:textSize="12sp"
-                style="?android:attr/borderlessButtonStyle"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_weight="1"

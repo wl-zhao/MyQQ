@@ -36,7 +36,7 @@ public class LoginActivity extends Activity {
     }
 
     private void initView(){
-        setTheme(R.style.AppTheme);//
+        setTheme(R.style.AppTheme);
         stunumEditText = findViewById(R.id.stunumEditText);
         passwordEditText = findViewById(R.id.passwordEditText);
     }
@@ -73,6 +73,8 @@ public class LoginActivity extends Activity {
             while(reply.equals("") && !LoginActivity.timeout);//2 second login attempt
             if (reply.equals("Error")){
                 Toast.makeText(this, "服务器连接失败", Toast.LENGTH_SHORT).show();
+                connectionTool.socket = null;
+                Connect();
                 return;
             }
 //            sleep.interrupt();
@@ -84,6 +86,7 @@ public class LoginActivity extends Activity {
                 intent.putExtra(Utils.MY_STUNUM_EXTRA, stunumEditText.getText().toString());
                 startActivity(intent);
                 my_stunum = stunumEditText.getText().toString();
+                return;
             }
             else if (reply.isEmpty()){
                 Toast.makeText(this, "服务器连接失败", Toast.LENGTH_SHORT).show();
@@ -96,7 +99,14 @@ public class LoginActivity extends Activity {
         }
     }
 
-
+    public void Connect() {
+        try {
+            if (connectionTool.socket == null || !connectionTool.socket.isConnected())
+                connectionTool.ConnectionInit(ConnectionTool.ServerIP, ConnectionTool.ServerPort, connectionTool.LocalPort);
+        } catch (Exception e) {
+            Toast.makeText(this, "服务器连接失败", Toast.LENGTH_SHORT).show();
+        }
+    }
 
     @Override
     public void onDestroy(){
