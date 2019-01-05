@@ -59,6 +59,7 @@
     <string name="create_group_successfully">成功创建群聊</string>
     <string name="tag_groupchat">[群聊]</string>
     <string name="test_stunum">2016011452</string>
+    <string name="no_chatting_self">不能与自己聊天</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>

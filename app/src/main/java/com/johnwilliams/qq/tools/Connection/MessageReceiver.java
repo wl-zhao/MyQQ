@@ -50,6 +50,25 @@ public class MessageReceiver implements Runnable{
         return unread_msgs.get(position);
     }
 
+    static public void deleteMessages(final String stu_num) {
+        String bql = "select * from ChatMessage where from_stunum = ? or to_stunum = ?";
+        BmobQuery<ChatMessage> chatMessageBmobQuery = new BmobQuery<>();
+        chatMessageBmobQuery.doSQLQuery(bql, new SQLQueryListener<ChatMessage>() {
+            @Override
+            public void done(BmobQueryResult<ChatMessage> bmobQueryResult, BmobException e) {
+                List<ChatMessage> results = bmobQueryResult.getResults();
+                for (ChatMessage result : results) {
+                    result.delete(new UpdateListener() {
+                        @Override
+                        public void done(BmobException e) {
+
+                        }
+                    });
+                }
+            }
+        }, stu_num, stu_num);
+    }
+
     static public void updateMessages(final ChatMessage chatMessage) {
         String bql = "select * from ChatMessage where time = ?";
         BmobQuery<ChatMessage> chatMessageBmobQuery = new BmobQuery<>();
@@ -193,9 +212,5 @@ public class MessageReceiver implements Runnable{
         List<ChatMessage> results = serverWorkerRunnable.getResults();
         unread_msgs.addAll(results);
         unread_num += results.size();
-//        for (int i = 0; i < results.size(); ++i){
-//            unread_msgs.add(results.get(i));
-//            unread_num++;
-//        }
     }
 }

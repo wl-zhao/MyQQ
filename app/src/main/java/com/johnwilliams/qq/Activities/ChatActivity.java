@@ -459,7 +459,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     
     private void initXListView(){
         mListView.setPullLoadEnable(false);
-        mListView.setPullRefreshEnable(true);
+        mListView.setPullRefreshEnable(false);
         mListView.setXListViewListener(this);
         mListView.setDividerHeight(0);
         mListView.setOnTouchListener(new View.OnTouchListener() {
@@ -751,19 +751,5 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                     break;
             }
         }
-    }
-
-    private String getLocalPath(Uri uri){
-        String localPath = null;
-        try {
-            Cursor cursor = getContentResolver().query(uri, null, null, null, null);
-            cursor.moveToFirst();
-            int columnIndex = cursor.getColumnIndex(MediaStore.Images.Media.DATA);
-            localPath = cursor.getString(columnIndex);
-            cursor.close();
-        } catch (Exception e){
-            e.printStackTrace();
-        }
-        return localPath;
     }
 }

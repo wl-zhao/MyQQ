@@ -93,6 +93,7 @@ public class MainActivity extends FragmentActivity implements SearchView.OnQuery
                     break;
                 case Utils.CLEAR_CHAT:
                     ((ChatFragment)mainActivity.mFragments[0]).mChatViewModel.clear();
+                    MessageReceiver.deleteMessages(my_stunum);
                     break;
                 case Utils.CLEAR_CONTACT:
                     ((ContactFragment)mainActivity.mFragments[1]).mContactViewModel.clear();

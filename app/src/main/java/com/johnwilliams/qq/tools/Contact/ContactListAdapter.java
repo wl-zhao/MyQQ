@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.johnwilliams.qq.Activities.ChatActivity;
 import com.johnwilliams.qq.Activities.LoginActivity;
@@ -194,7 +195,10 @@ public class ContactListAdapter extends RecyclerView.Adapter<ContactListAdapter.
         Contact contact = mContacts.get(position);
         String friend_stunum = contact.student_number;
         String friend_name = contact.name;
-
+        if (friend_stunum.equals(MainActivity.my_stunum)) {
+            Toast.makeText(mContext, R.string.no_chatting_self, Toast.LENGTH_SHORT).show();
+            return;
+        }
         // Add new chat
         Message msg = new Message();
         msg.what = Utils.NEW_CHAT;

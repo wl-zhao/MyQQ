@@ -9,6 +9,11 @@ import com.johnwilliams.qq.tools.Utils;
 import java.net.*;
 import java.io.*;
 import java.util.Arrays;
+import java.util.concurrent.Callable;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 //import cn.bmob.v3.util.AppUtils;
 
@@ -63,22 +68,20 @@ public class ConnectionTool {
 //        }
 //    };
 
-    public void ConnectionInit(String host, String port, final String localPort) throws Exception{
+    public void ConnectionInit(final String host, final String port, final String localPort) throws Exception{
 //        init.execute(host, port);
         mIp = host;
         mPort = port;
-        AsyncTask<String, Void, Void> init = new AsyncTask<String, Void, Void>() {
+        Thread connectionThread = new Thread(new Runnable() {
             @Override
-            protected Void doInBackground(String... strings) {
+            public void run() {
                 try{
                     if (socket != null && socket.isConnected()){
-                        return null;
+                        return;
                     }
                     socket = new Socket();
                     socket.setSoTimeout(2000);
-//                    socket.setReuseAddress(true);//TODO: important!
-//                    socket.bind(new InetSocketAddress(Integer.parseInt(localPort)));
-                    socket.connect(new InetSocketAddress(strings[0], Integer.parseInt(strings[1])));
+                    socket.connect(new InetSocketAddress(host, Integer.parseInt(port)));
                     outToServer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
                     inFromServer = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                 }
@@ -86,10 +89,32 @@ public class ConnectionTool {
                 {
                     Log.v("ErrorBalaBala", e.getMessage());
                 }
-                return null;
             }
-        };
-        init.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, host, port);
+        });
+        connectionThread.start();
+//        AsyncTask<String, Void, Void> init = new AsyncTask<String, Void, Void>() {
+//            @Override
+//            protected Void doInBackground(String... strings) {
+//                try{
+//                    if (socket != null && socket.isConnected()){
+//                        return null;
+//                    }
+//                    socket = new Socket();
+//                    socket.setSoTimeout(2000);
+////                    socket.setReuseAddress(true);//TODO: important!
+////                    socket.bind(new InetSocketAddress(Integer.parseInt(localPort)));
+//                    socket.connect(new InetSocketAddress(strings[0], Integer.parseInt(strings[1])));
+//                    outToServer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
+//                    inFromServer = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+//                }
+//                catch (Exception e)
+//                {
+//                    Log.v("ErrorBalaBala", e.getMessage());
+//                }
+//                return null;
+//            }
+//        };
+//        init.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, host, port);
 //        init.execute(host, port);
     }
 
@@ -126,7 +151,7 @@ public class ConnectionTool {
         return reply.equals("loo");
     }
 
-    public String SendCommand(String cmd) throws Exception {
+    public String SendCommand(final String cmd) throws Exception {
         final AsyncTask<String, Void, String> send = new AsyncTask<String, Void, String>() {
             @Override
             protected String doInBackground(String... strings) {
@@ -185,6 +210,44 @@ public class ConnectionTool {
             socket.close();
         } catch (Exception e){
 
+        }
+    }
+
+    private class RetString implements Callable<String> {
+        String mCmd;
+        RetString(String cmd) {
+            mCmd = cmd;
+        }
+
+        @Override
+        public String call(){
+            try{
+                if (inFromServer == null){
+                    inFromServer = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                }
+                Arrays.fill(cbuf, '\0');
+                if (outToServer == null) {
+                    outToServer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
+                }
+                outToServer.write(mCmd);
+                outToServer.flush();
+                inFromServer.read(cbuf);
+            }
+            catch (Exception e){
+                Log.v("Error", e.getMessage());
+                if (e.getMessage().contains("EBADF")) {
+                    try {
+                        socket = null;
+                        ConnectionInit(mIp, mPort, "");
+                    } catch (Exception ee) {
+                        ee.printStackTrace();
+                    }
+                }
+                return "Error";
+            }
+            int i = 0;
+            while(cbuf[i++] != '\0');
+            return String.valueOf(cbuf, 0, --i);
         }
     }
 }

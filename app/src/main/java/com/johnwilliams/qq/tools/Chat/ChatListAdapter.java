@@ -204,6 +204,10 @@ public class ChatListAdapter extends RecyclerView.Adapter<ChatListAdapter.ChatVi
         Chat chat = mChats.get(position);
         String friend_stunum = chat.student_number;
         String friend_name = chat.name;
+        if (friend_stunum.equals(MainActivity.my_stunum)) {
+            Toast.makeText(mContext, R.string.no_chatting_self, Toast.LENGTH_SHORT).show();
+            return;
+        }
         try {
             Intent intent = new Intent(mContext, ChatActivity.class);
             intent.putExtra(Utils.FRIEND_STUNUM_EXTRA, friend_stunum);

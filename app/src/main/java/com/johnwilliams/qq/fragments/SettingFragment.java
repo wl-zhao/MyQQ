@@ -46,11 +46,9 @@ public class SettingFragment extends MyFragment implements View.OnClickListener 
         switch (v.getId()){
             case R.id.btn_clear_chats:
                 message = Utils.CLEAR_CHAT;
-                MainActivity.mainMessageHandler.sendEmptyMessage(Utils.CLEAR_CHAT);
                 break;
             case R.id.btn_clear_contacts:
                 message = Utils.CLEAR_CONTACT;
-                MainActivity.mainMessageHandler.sendEmptyMessage(Utils.CLEAR_CONTACT);
                 break;
         }
 
