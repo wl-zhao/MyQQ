@@ -19,9 +19,9 @@ import com.johnwilliams.qq.R;
 import com.johnwilliams.qq.tools.Connection.MessageSender;
 import com.johnwilliams.qq.tools.Contact.Contact;
 import com.johnwilliams.qq.tools.Contact.ContactViewModel;
-import com.johnwilliams.qq.tools.CreateGroupAdapter;
+import com.johnwilliams.qq.Adapters.CreateGroupAdapter;
 import com.johnwilliams.qq.tools.Message.ChatMessage;
-import com.johnwilliams.qq.tools.Utils;
+import com.johnwilliams.qq.tools.Utils.Utils;
 
 import java.util.ArrayList;
 import java.util.Date;

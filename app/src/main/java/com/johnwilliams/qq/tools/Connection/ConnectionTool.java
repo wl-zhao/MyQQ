@@ -1,19 +1,14 @@
 package com.johnwilliams.qq.tools.Connection;
 
 import android.os.AsyncTask;
-import android.os.Handler;
 import android.util.Log;
 
-import com.johnwilliams.qq.tools.Utils;
+import com.johnwilliams.qq.tools.Utils.Utils;
 
 import java.net.*;
 import java.io.*;
 import java.util.Arrays;
 import java.util.concurrent.Callable;
-import java.util.concurrent.Executor;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 
 //import cn.bmob.v3.util.AppUtils;
 
@@ -142,7 +137,6 @@ public class ConnectionTool {
     public String Login(String student_number, String password) throws Exception{
         String reply = SendCommand(student_number + "_" +
                 password);
-//        return reply.equals("lol");
         return reply;
     }
 

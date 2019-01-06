@@ -11,9 +11,7 @@ import android.widget.TextView;
 
 import com.johnwilliams.qq.Activities.MainActivity;
 import com.johnwilliams.qq.R;
-import com.johnwilliams.qq.tools.Utils;
-
-import org.w3c.dom.Text;
+import com.johnwilliams.qq.tools.Utils.Utils;
 
 public class SettingFragment extends MyFragment implements View.OnClickListener {
     private TextView tv_name;

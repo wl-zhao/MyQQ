@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">QQ</string>
+    <string name="app_name">MyQQ</string>
     <string name="login_button">登录</string>>
     <string name="student_num">学号</string>
     <string name="password">密码</string>

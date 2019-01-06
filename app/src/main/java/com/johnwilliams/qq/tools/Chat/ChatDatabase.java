@@ -52,13 +52,6 @@ public abstract class ChatDatabase extends RoomDatabase {
 
         @Override
         protected Void doInBackground(final Void... params){
-//            mDao.deleteAll();
-//            Chat chat = new Chat("2016011451", "佳", new Date().getTime(), 1, "亮亮我爱你");
-//            mDao.insert(chat);
-//            chat = new Chat("2016011452", "赵文亮",
-//                    new Date().getTime() - 10000000000L, 1, "佳佳我爱你");
-//            mDao.insert(chat);
-//            Toast.makeText(null, "Love Lucy", Toast.LENGTH_LONG).show();
             return null;
         }
     }

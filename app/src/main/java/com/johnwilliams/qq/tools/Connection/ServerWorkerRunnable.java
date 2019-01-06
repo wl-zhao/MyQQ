@@ -1,14 +1,11 @@
 package com.johnwilliams.qq.tools.Connection;
 
-import android.app.Activity;
-import android.content.res.Resources;
 import android.os.Environment;
 import android.os.Message;
 
 import com.johnwilliams.qq.Activities.ChatActivity;
 import com.johnwilliams.qq.Activities.MainActivity;
-import com.johnwilliams.qq.R;
-import com.johnwilliams.qq.tools.Utils;
+import com.johnwilliams.qq.tools.Utils.Utils;
 import com.johnwilliams.qq.tools.Message.ChatMessage;
 
 import java.net.Socket;
@@ -16,14 +13,10 @@ import java.util.List;
 import java.io.*;
 import java.util.*;
 
-import androidx.annotation.MainThread;
-
 public class ServerWorkerRunnable implements Runnable{
     protected Socket clientSocket;
     protected char[] messageBuffer = new char[1000];
     private volatile List<ChatMessage> results = new ArrayList<>();
-    private ChatActivity.ChatMessageHandler chatMessageHandler;
-    private MainActivity.MainMessageHandler mainMessageHandler;
     private boolean isStopped = false;
 
     public ServerWorkerRunnable(Socket clientSocket){

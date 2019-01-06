@@ -5,7 +5,7 @@ import android.os.Message;
 import android.util.Log;
 
 import com.johnwilliams.qq.Activities.ChatActivity;
-import com.johnwilliams.qq.tools.Utils;
+import com.johnwilliams.qq.tools.Utils.Utils;
 import com.johnwilliams.qq.tools.Message.ChatMessage;
 
 import java.io.IOException;
@@ -21,6 +21,7 @@ import cn.bmob.v3.BmobQuery;
 import cn.bmob.v3.datatype.BmobQueryResult;
 import cn.bmob.v3.exception.BmobException;
 import cn.bmob.v3.listener.SQLQueryListener;
+import cn.bmob.v3.listener.SaveListener;
 import cn.bmob.v3.listener.UpdateListener;
 
 public class MessageReceiver implements Runnable{
@@ -39,6 +40,25 @@ public class MessageReceiver implements Runnable{
         unread_msgs = new ArrayList<>();
     }
 
+    public static void saveMsg(final ChatMessage chatMessage) {
+        String bql = "select * from ChatMessage where time = ?";
+        BmobQuery<ChatMessage> chatMessageBmobQuery = new BmobQuery<>();
+        chatMessageBmobQuery.doSQLQuery(bql, new SQLQueryListener<ChatMessage>() {
+            @Override
+            public void done(BmobQueryResult<ChatMessage> bmobQueryResult, BmobException e) {
+                if (bmobQueryResult == null || bmobQueryResult.getResults().isEmpty())
+                    chatMessage.save(new SaveListener<String>() {
+                        @Override
+                        public void done(String s, BmobException e) {
+
+                        }
+                    });
+                if (e != null) {
+                    e.printStackTrace();
+                }
+            }
+        }, chatMessage.getTime());
+    }
     public List<ChatMessage> readMsg(){
         List<ChatMessage> result = new ArrayList<>(unread_msgs);
         unread_msgs.clear();
@@ -56,6 +76,9 @@ public class MessageReceiver implements Runnable{
         chatMessageBmobQuery.doSQLQuery(bql, new SQLQueryListener<ChatMessage>() {
             @Override
             public void done(BmobQueryResult<ChatMessage> bmobQueryResult, BmobException e) {
+                if (bmobQueryResult == null) {
+                    return;
+                }
                 List<ChatMessage> results = bmobQueryResult.getResults();
                 for (ChatMessage result : results) {
                     result.delete(new UpdateListener() {
@@ -188,7 +211,9 @@ public class MessageReceiver implements Runnable{
         try {
             if (serverSocket != null){
                 serverSocket.close();
-                serverWorkerRunnable.stop();
+                if (serverWorkerRunnable != null) {
+                    serverWorkerRunnable.stop();
+                }
                 serverSocket = null;
             }
         } catch (IOException e){

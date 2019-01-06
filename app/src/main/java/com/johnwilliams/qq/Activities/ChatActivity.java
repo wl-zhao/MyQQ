@@ -3,7 +3,6 @@ package com.johnwilliams.qq.Activities;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -46,12 +45,12 @@ import com.johnwilliams.qq.lib.Emoj.FaceTextUtils;
 import com.johnwilliams.qq.lib.XListView.XListView;
 import com.johnwilliams.qq.tools.Connection.MessageReceiver;
 import com.johnwilliams.qq.tools.Connection.MessageSender;
-import com.johnwilliams.qq.tools.RecordManager;
-import com.johnwilliams.qq.tools.Utils;
+import com.johnwilliams.qq.tools.Utils.RecordManager;
+import com.johnwilliams.qq.tools.Utils.Utils;
 import com.johnwilliams.qq.tools.Message.ChatMessage;
-import com.johnwilliams.qq.tools.Message.MessageAdapter;
-import com.johnwilliams.qq.tools.PermissionManager;
-import com.johnwilliams.qq.tools.URIConverter;
+import com.johnwilliams.qq.Adapters.MessageAdapter;
+import com.johnwilliams.qq.tools.Utils.PermissionManager;
+import com.johnwilliams.qq.tools.Utils.URIConverter;
 
 import java.io.File;
 import java.lang.ref.WeakReference;
@@ -93,9 +92,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
 
     private ViewPager pager_emoj;
-    private TextView tv_picture;
     private TextView tv_camera;
-    private TextView tv_location;
     private TextView tv_file;
     private TextView tv_voice_tips;
     private ImageView iv_record;
@@ -298,10 +295,8 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void initAddView(){
-        tv_picture = findViewById(R.id.tv_picture);
         tv_camera = findViewById(R.id.tv_camera);
         tv_file = findViewById(R.id.tv_file);
-        tv_picture.setOnClickListener(this);
         tv_camera.setOnClickListener(this);
         tv_file.setOnClickListener(this);
     }
@@ -356,13 +351,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                         layout_record.setVisibility(View.VISIBLE);
                         tv_voice_tips.setText(getString(R.string.voice_cancel_tips));
                         recordManager.startRecording();
-                        audioSenders.clear();
-                        for (String stu_num : friend_stunums) {
-                            MessageSender audioSender = new MessageSender();
-                            audioSender.DataInit(my_stunum, stu_num);
-                            audioSender.ConnectionInit();
-                            audioSenders.add(audioSender);
-                        }
+                        refreshAudioSender();
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -667,16 +656,30 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void refreshFileSender() {
-        try {
-            fileSenders.clear();
-            for (String stu_num : friend_stunums) {
-                MessageSender fileSender = new MessageSender();
-                fileSender.DataInit(my_stunum, stu_num);
+        fileSenders.clear();
+        for (String stu_num : friend_stunums) {
+            MessageSender fileSender = new MessageSender();
+            fileSender.DataInit(my_stunum, stu_num);
+            try {
                 fileSender.ConnectionInit();
                 fileSenders.add(fileSender);
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-        } catch (Exception e){
+        }
+    }
 
+    private void refreshAudioSender() {
+        audioSenders.clear();
+        for (String stu_num : friend_stunums) {
+            MessageSender audioSender = new MessageSender();
+            audioSender.DataInit(my_stunum, stu_num);
+            try {
+                audioSender.ConnectionInit();
+                audioSenders.add(audioSender);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 

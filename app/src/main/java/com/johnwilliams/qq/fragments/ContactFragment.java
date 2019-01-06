@@ -10,11 +10,10 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.johnwilliams.qq.R;
 import com.johnwilliams.qq.tools.Contact.Contact;
-import com.johnwilliams.qq.tools.Contact.ContactListAdapter;
+import com.johnwilliams.qq.Adapters.ContactListAdapter;
 import com.johnwilliams.qq.tools.Contact.ContactViewModel;
 
 import java.util.List;

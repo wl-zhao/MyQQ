@@ -23,17 +23,14 @@ import com.johnwilliams.qq.tools.Chat.Chat;
 import com.johnwilliams.qq.tools.Connection.MessageReceiver;
 import com.johnwilliams.qq.tools.Connection.MessageSender;
 import com.johnwilliams.qq.tools.Message.ChatMessage;
-import com.johnwilliams.qq.tools.Utils;
+import com.johnwilliams.qq.tools.Utils.Utils;
 import com.johnwilliams.qq.tools.Contact.Contact;
-import com.johnwilliams.qq.tools.PermissionManager;
+import com.johnwilliams.qq.tools.Utils.PermissionManager;
 
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
-import java.util.Date;
 
 import cn.bmob.v3.Bmob;
-import cn.bmob.v3.exception.BmobException;
-import cn.bmob.v3.listener.SaveListener;
 
 
 public class MainActivity extends FragmentActivity implements SearchView.OnQueryTextListener, View.OnClickListener {
@@ -84,12 +81,7 @@ public class MainActivity extends FragmentActivity implements SearchView.OnQuery
                     }
 
                     chatMessage.setStatus(ChatMessage.MSG_STATUS.SENT);
-                    chatMessage.save(new SaveListener<String>() {
-                        @Override
-                        public void done(String s, BmobException e) {
-
-                        }
-                    });
+                    MessageReceiver.saveMsg(chatMessage);
                     break;
                 case Utils.CLEAR_CHAT:
                     ((ChatFragment)mainActivity.mFragments[0]).mChatViewModel.clear();
@@ -215,14 +207,13 @@ public class MainActivity extends FragmentActivity implements SearchView.OnQuery
     public void onBackPressed(){
         try {
             if (my_stunum != null){
-                messageReceiver.stop();
                 LoginActivity.connectionTool.Logout(my_stunum);
                 LoginActivity.connectionTool.socket.close();
                 LoginActivity.connectionTool.socket = null;
-//                mainMessageHandler = null;
+                messageReceiver.stop();
             }
         } catch (Exception e){
-
+            e.printStackTrace();
         }
         finish();
     }

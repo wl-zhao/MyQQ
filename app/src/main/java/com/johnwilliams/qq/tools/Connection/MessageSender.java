@@ -1,7 +1,5 @@
 package com.johnwilliams.qq.tools.Connection;
 
-import android.icu.util.Output;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Message;
 import android.util.Log;
@@ -9,14 +7,10 @@ import android.util.Log;
 import com.johnwilliams.qq.Activities.ChatActivity;
 import com.johnwilliams.qq.Activities.LoginActivity;
 import com.johnwilliams.qq.tools.Message.ChatMessage;
-import com.johnwilliams.qq.tools.Utils;
+import com.johnwilliams.qq.tools.Utils.Utils;
 
-import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileInputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.util.Arrays;
 
 public class MessageSender extends ConnectionTool {
 
